@@ -3,14 +3,14 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<scala.version>2.10.0</scala.version>
+		<scala.version>2.10.3</scala.version>
 		<scala.binary.version>2.10</scala.binary.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<groupId>eu.cdevreeze.yaidom</groupId>
 	<artifactId>yaidom-xlink_${scala.binary.version}</artifactId>
-	<version>0.7.1-SNAPSHOT</version>
+	<version>0.8.0</version>
 	<packaging>jar</packaging>
 
 	<parent>
@@ -136,7 +136,7 @@
 		<dependency>
 			<groupId>eu.cdevreeze.yaidom</groupId>
 			<artifactId>yaidom_${scala.binary.version}</artifactId>
-			<version>0.7.0</version>
+			<version>0.8.0</version>
 		</dependency>
 
 		<!-- Testing dependencies -->
@@ -144,14 +144,14 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.10</version>
+			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.scalatest</groupId>
 			<artifactId>scalatest_${scala.binary.version}</artifactId>
-			<version>1.9.1</version>
+			<version>2.0</version>
 			<scope>test</scope>
 		</dependency>
 

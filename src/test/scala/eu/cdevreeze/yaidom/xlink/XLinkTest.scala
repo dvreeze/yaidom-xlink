@@ -37,22 +37,22 @@ class XLinkTest extends Suite {
   }
 
   private def doTest(root: Elem) {
-    expectResult(Set(EName("courseload"), EName("tooltip"), EName("person"), EName("course"), EName("gpa"), EName("go"))) {
+    assertResult(Set(EName("courseload"), EName("tooltip"), EName("person"), EName("course"), EName("gpa"), EName("go"))) {
       val enames = sampleXml.wrappedElem.findAllElemsOrSelf collect { case e => e.resolvedName }
       enames.toSet
     }
 
-    expectResult(Some(sampleXml.wrappedElem)) {
+    assertResult(Some(sampleXml.wrappedElem)) {
       val result = sampleXml.wrappedElem.findAllElemsOrSelf collect { case e if XLink.mustBeExtendedLink(e) => e }
       result.headOption
     }
 
-    expectResult(Set("students/patjones62.xml", "profs/jaysmith7.xml", "courses/cs101.xml")) {
+    assertResult(Set("students/patjones62.xml", "profs/jaysmith7.xml", "courses/cs101.xml")) {
       val result = sampleXml.wrappedElem.findAllElems collect { case e if XLink.mustBeLocator(e) => Locator(e).href.toString }
       result.toSet
     }
 
-    expectResult(Set("students/patjones62.xml", "profs/jaysmith7.xml", "courses/cs101.xml")) {
+    assertResult(Set("students/patjones62.xml", "profs/jaysmith7.xml", "courses/cs101.xml")) {
       val result = sampleXml.wrappedElem filterElems { e => XLink.mustBeLocator(e) } map { e => Locator(e).href.toString }
       result.toSet
     }
@@ -64,25 +64,25 @@ class XLinkTest extends Suite {
         toLoc <- sampleXml.wrappedElem.findAllChildElems collect { case e if XLink.mustBeLocator(e) && Locator(e).labelOption == arc.toOption => Locator(e) }
       } yield (fromLoc.href.toString, toLoc.href.toString)
 
-    expectResult(Some("courses/cs101.xml")) {
+    assertResult(Some("courses/cs101.xml")) {
       fromToHrefPairs.headOption map { _._1 }
     }
 
-    expectResult(Some("students/patjones62.xml")) {
+    assertResult(Some("students/patjones62.xml")) {
       fromToHrefPairs.headOption map { _._2 }
     }
 
-    expectResult(List("courses/cs101.xml")) {
+    assertResult(List("courses/cs101.xml")) {
       sampleXml.labeledLocators.getOrElse("CS-101", Vector()) map { loc => loc.href.toString }
     }
-    expectResult(List("courses/cs101.xml")) {
+    assertResult(List("courses/cs101.xml")) {
       sampleXml.labeledXLinks.getOrElse("CS-101", Vector()) collect { case loc: Locator => loc.href.toString }
     }
 
-    expectResult(List(QName("gpa"))) {
+    assertResult(List(QName("gpa"))) {
       sampleXml.labeledResources.getOrElse("PatJonesGPA", Vector()) map { res => res.wrappedElem.qname }
     }
-    expectResult(List(QName("gpa"))) {
+    assertResult(List(QName("gpa"))) {
       sampleXml.labeledXLinks.getOrElse("PatJonesGPA", Vector()) map { link => link.wrappedElem.qname }
     }
   }
