@@ -56,11 +56,50 @@ final class SimpleLink(override val wrappedElem: Elem) extends Link(wrappedElem)
   def actuateOption: Option[String] = wrappedElem.attributeOption(XLinkActuateEName)
 }
 
+/**
+ * Extended link. This object is expensive to create, because it aggressively caches its child XLinks.
+ */
 final class ExtendedLink(override val wrappedElem: Elem) extends Link(wrappedElem) {
   require(xlinkType == "extended")
 
   /** Stored XLink children, preventing recreations of XLink children, possibly at the expense of somewhat more memory usage */
   val xlinkChildren: immutable.IndexedSeq[XLink] = wrappedElem.findAllChildElems collect { case e if mustBeXLink(e) => XLink(e) }
+
+  /**
+   * Returns the (cached) XLink resources, grouped by xlink:label attribute.
+   *
+   * That is, returns:
+   * {{{
+   * resourceXLinks filter (_.labelOption.isDefined) groupBy (_.labelOption.get)
+   * }}}
+   */
+  val labeledResources: Map[String, immutable.IndexedSeq[Resource]] = {
+    resourceXLinks filter (_.labelOption.isDefined) groupBy (_.labelOption.get)
+  }
+
+  /**
+   * Returns the (cached) XLink locators, grouped by xlink:label attribute
+   *
+   * That is, returns:
+   * {{{
+   * locatorXLinks filter (_.labelOption.isDefined) groupBy (_.labelOption.get)
+   * }}}
+   */
+  val labeledLocators: Map[String, immutable.IndexedSeq[Locator]] = {
+    locatorXLinks filter (_.labelOption.isDefined) groupBy (_.labelOption.get)
+  }
+
+  /**
+   * Returns the (cached) XLink resources and locators, grouped by xlink:label attribute
+   *
+   * That is, returns:
+   * {{{
+   * (resourceXLinks ++ locatorXLinks) filter (_.labelOption.isDefined) groupBy (_.labelOption.get)
+   * }}}
+   */
+  val labeledXLinks: Map[String, immutable.IndexedSeq[LabeledXLink]] = {
+    (resourceXLinks ++ locatorXLinks) filter (_.labelOption.isDefined) groupBy (_.labelOption.get)
+  }
 
   def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleEName)
   def titleOption: Option[String] = wrappedElem.attributeOption(XLinkTitleEName)
@@ -69,42 +108,6 @@ final class ExtendedLink(override val wrappedElem: Elem) extends Link(wrappedEle
   def locatorXLinks: immutable.IndexedSeq[Locator] = xlinkChildren collect { case xlink: Locator => xlink }
   def arcXLinks: immutable.IndexedSeq[Arc] = xlinkChildren collect { case xlink: Arc => xlink }
   def resourceXLinks: immutable.IndexedSeq[Resource] = xlinkChildren collect { case xlink: Resource => xlink }
-
-  /**
-   * Returns the XLink resources, grouped by xlink:label attribute.
-   *
-   * That is, returns:
-   * {{{
-   * resourceXLinks filter (_.labelOption.isDefined) groupBy (_.labelOption.get)
-   * }}}
-   */
-  def labeledResources: Map[String, immutable.IndexedSeq[Resource]] = {
-    resourceXLinks filter (_.labelOption.isDefined) groupBy (_.labelOption.get)
-  }
-
-  /**
-   * Returns the XLink locators, grouped by xlink:label attribute
-   *
-   * That is, returns:
-   * {{{
-   * locatorXLinks filter (_.labelOption.isDefined) groupBy (_.labelOption.get)
-   * }}}
-   */
-  def labeledLocators: Map[String, immutable.IndexedSeq[Locator]] = {
-    locatorXLinks filter (_.labelOption.isDefined) groupBy (_.labelOption.get)
-  }
-
-  /**
-   * Returns the XLink resources and locators, grouped by xlink:label attribute
-   *
-   * That is, returns:
-   * {{{
-   * (resourceXLinks ++ locatorXLinks) filter (_.labelOption.isDefined) groupBy (_.labelOption.get)
-   * }}}
-   */
-  def labeledXLinks: Map[String, immutable.IndexedSeq[LabeledXLink]] = {
-    (resourceXLinks ++ locatorXLinks) filter (_.labelOption.isDefined) groupBy (_.labelOption.get)
-  }
 }
 
 final class Arc(override val wrappedElem: Elem) extends XLink(wrappedElem) {
