@@ -3,6 +3,20 @@ CHANGELOG
 =========
 
 
+0.8.1
+=====
+
+This version depends on yaidom 0.8.1, and therefore adds support for Scala 2.11.X.
+It also made ``labeledResources`` and ``labeledLocators`` in extended links "vals", to speed up lookups within extended links,
+at the expense of more expensive creation of extended links.
+
+
+0.8.0
+=====
+
+This version depends on yaidom 0.8.0, and therefore drops support for Scala 2.9.X.
+
+
 0.7.0
 =====
 

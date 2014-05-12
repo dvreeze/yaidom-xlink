@@ -9,21 +9,17 @@ organization := "eu.cdevreeze.yaidom"
 
 version := "0.8.1-SNAPSHOT"
 
-scalaVersion := "2.10.3"
+scalaVersion := "2.10.4"
 
-crossScalaVersions := Seq("2.10.3")
+crossScalaVersions := Seq("2.10.4", "2.11.0")
 
-scalacOptions ++= Seq("-unchecked", "-deprecation")
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
-scalacOptions <++= scalaBinaryVersion map { version =>
-  if (version.contains("2.10")) Seq("-feature") else Seq()
-}
-
-libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "0.8.0"
+libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "0.8.1"
 
 libraryDependencies += "junit" % "junit" % "4.11" % "test"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.0" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "2.1.3" % "test"
 
 publishMavenStyle := true
 
