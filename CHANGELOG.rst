@@ -3,6 +3,12 @@ CHANGELOG
 =========
 
 
+0.8.2
+=====
+
+This version depends on yaidom 0.8.2, and defaults to Scala 2.11.
+
+
 0.8.1
 =====
 
