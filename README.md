@@ -7,23 +7,23 @@ Yaidom-based XLink support. This library offers thin XLink wrappers around yaido
 Usage
 =====
 
-Yaidom-xlink versions can be found in the Maven central repository. Assuming version 0.7.0, yaidom-xlink can be added as dependency
+Yaidom-xlink versions can be found in the Maven central repository. Assuming version 1.0, yaidom-xlink can be added as dependency
 as follows (in an SBT or Maven build):
 
 **SBT**::
 
-    libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom-xlink" % "0.7.0"
+    libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom-xlink" % "1.0"
 
 **Maven2**::
 
     <dependency>
       <groupId>eu.cdevreeze.yaidom</groupId>
-      <artifactId>yaidom-xlink_2.10</artifactId>
-      <version>0.7.0</version>
+      <artifactId>yaidom-xlink_2.11</artifactId>
+      <version>1.0</version>
     </dependency>
 
 Note that yaidom-xlink itself depends only on yaidom, and its dependencies.
-Yaidom-xlink has been cross-built for several Scala versions, leading to artifactIds yaidom-xlink_2.9.1, yaidom-xlink_2.9.2, etc.
+Yaidom-xlink has been cross-built for several Scala versions, leading to artifactIds referring to different Scala (binary) versions.
 
 Yaidom-xlink requires Java version 1.6 or later.
 
