@@ -3,6 +3,12 @@ CHANGELOG
 =========
 
 
+1.1
+===
+
+This version depends on yaidom 1.1.
+
+
 1.0
 ===
 

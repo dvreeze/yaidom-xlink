@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package xlink
+package eu.cdevreeze.yaidom.xlink
 
-import java.{ util => jutil, io => jio }
+import scala.Vector
 import scala.collection.immutable
-import org.junit.{ Test, Before, Ignore }
+
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.{ Suite, BeforeAndAfterAll }
+import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
+
+import eu.cdevreeze.yaidom.core.Declarations
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.ElemBuilder
+import eu.cdevreeze.yaidom.simple.NodeBuilder
 
 /**
  * XLink test case.
@@ -32,11 +39,11 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class XLinkTest extends Suite {
 
-  @Test def testRetrieval() {
+  @Test def testRetrieval(): Unit = {
     doTest(sampleXml.wrappedElem)
   }
 
-  private def doTest(root: Elem) {
+  private def doTest(root: Elem): Unit = {
     assertResult(Set(EName("courseload"), EName("tooltip"), EName("person"), EName("course"), EName("gpa"), EName("go"))) {
       val enames = sampleXml.wrappedElem.findAllElemsOrSelf collect { case e => e.resolvedName }
       enames.toSet
@@ -87,7 +94,7 @@ class XLinkTest extends Suite {
     }
   }
 
-  private val sampleXml: xlink.ExtendedLink = {
+  private val sampleXml: ExtendedLink = {
     import NodeBuilder._
 
     // Example from http://www.w3.org/TR/xlink/ (adapted)
@@ -103,7 +110,7 @@ class XLinkTest extends Suite {
             qname = QName("tooltip"),
             attributes = Vector(QName("xlink:type") -> "title"),
             txt = "Course Load for Pat Jones"),
-          elem(
+          emptyElem(
             qname = QName("person"),
             attributes = Vector(
               QName("xlink:type") -> "locator",
@@ -111,7 +118,7 @@ class XLinkTest extends Suite {
               QName("xlink:label") -> "student62",
               QName("xlink:role") -> "http://www.example.com/linkprops/student",
               QName("xlink:title") -> "Pat Jones")),
-          elem(
+          emptyElem(
             qname = QName("person"),
             attributes = Vector(
               QName("xlink:type") -> "locator",
@@ -120,7 +127,7 @@ class XLinkTest extends Suite {
               QName("xlink:role") -> "http://www.example.com/linkprops/professor",
               QName("xlink:title") -> "Dr. Jay Smith")),
           comment(" more remote resources for professors, teaching assistants, etc. "),
-          elem(
+          emptyElem(
             qname = QName("course"),
             attributes = Vector(
               QName("xlink:type") -> "locator",
@@ -135,7 +142,7 @@ class XLinkTest extends Suite {
               QName("xlink:label") -> "PatJonesGPA",
               QName("xlink:role") -> "http://www.example.com/linkprops/gpa"),
             txt = "3.5"),
-          elem(
+          emptyElem(
             qname = QName("go"),
             attributes = Vector(
               QName("xlink:type") -> "arc",
@@ -145,7 +152,7 @@ class XLinkTest extends Suite {
               QName("xlink:show") -> "new",
               QName("xlink:actuate") -> "onRequest",
               QName("xlink:title") -> "Pat Jones's GPA")),
-          elem(
+          emptyElem(
             qname = QName("go"),
             attributes = Vector(
               QName("xlink:type") -> "arc",
@@ -155,7 +162,7 @@ class XLinkTest extends Suite {
               QName("xlink:show") -> "replace",
               QName("xlink:actuate") -> "onRequest",
               QName("xlink:title") -> "Pat Jones, auditing the course")),
-          elem(
+          emptyElem(
             qname = QName("go"),
             attributes = Vector(
               QName("xlink:type") -> "arc",
@@ -168,6 +175,6 @@ class XLinkTest extends Suite {
 
     val root: Elem = rootBuilder.build()
 
-    xlink.ExtendedLink(root)
+    ExtendedLink(root)
   }
 }

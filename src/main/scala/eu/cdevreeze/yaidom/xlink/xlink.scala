@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom
-package xlink
+package eu.cdevreeze.yaidom.xlink
 
 import java.net.URI
+
 import scala.collection.immutable
+
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.simple.Elem
 import XLink._
 
 /**
