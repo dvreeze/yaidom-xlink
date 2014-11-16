@@ -16,6 +16,7 @@
 
 package eu.cdevreeze.yaidom.xlink.link
 
+import java.io.File
 import java.net.URI
 
 import scala.Vector
@@ -45,10 +46,22 @@ class LinkbaseTest extends Suite {
     val docUris =
       Vector("202-01-HrefResolution.xsd", "202-01-HrefResolution-label.xml").map(v => classOf[LinkbaseTest].getResource(s"$pathPrefix/$v").toURI)
 
-    implicit val taxo = parseTaxonomy(docUris ++ commonFileUris)
+    val files = findFiles(taxoRootDir) ++ findFiles(confSuiteRootDir)
+
+    implicit val taxo = parseTaxonomy(files.map(_.toURI))
+
+    println(s"Number of taxonomy files: ${taxo.docsByUri.size}")
 
     val linkbase = taxo.docsByUri.filterKeys(_.toString.contains("202-01-HrefResolution-label.xml")).values.head
     val linkbaseElem = Linkbase(linkbase.docElem)
+
+    val allLinkbasesByUri = taxo.docsByUri flatMap {
+      case (uri, doc) =>
+        if (uri.toString.contains(".xml")) Vector(Linkbase(doc.docElem))
+        else Vector()
+    }
+
+    println(s"Number of linkbase files: ${allLinkbasesByUri.size}")
 
     val schema = taxo.docsByUri.filterKeys(_.toString.contains("202-01-HrefResolution.xsd")).values.head
     val schemaElem = schema.docElem
@@ -81,26 +94,42 @@ class LinkbaseTest extends Suite {
   private def parseTaxonomy(docUris: Vector[URI]): Taxonomy = {
     val docParser = DocumentParserUsingDom.newInstance
     val docs =
-      docUris.map(uri => docParser.parse(uri).withUriOption(Some(convertKnownUriToOriginalUri(uri))))
+      docUris.map(uri => docParser.parse(uri).withUriOption(Some(convertUriToOriginalUri(uri))))
     val resultDocs = docs.map(doc => docaware.Document(doc.uriOption.get, doc))
 
     Taxonomy.from(resultDocs.map(doc => TaxonomyDoc.fromDocawareElem(doc.documentElement)))
   }
 
-  private def convertKnownUriToOriginalUri(uri: URI): URI = {
+  private def convertUriToOriginalUri(uri: URI): URI = {
     if (uri.getScheme != "file") uri
     else {
-      if (uri.getPath.endsWith("xbrl-instance-2003-12-31.xsd")) new URI("http://www.xbrl.org/2003/xbrl-instance-2003-12-31.xsd")
-      else if (uri.getPath.endsWith("xbrl-linkbase-2003-12-31.xsd")) new URI("http://www.xbrl.org/2003/xbrl-linkbase-2003-12-31.xsd")
-      else if (uri.getPath.endsWith("xl-2003-12-31.xsd")) new URI("http://www.xbrl.org/2003/xl-2003-12-31.xsd")
-      else if (uri.getPath.endsWith("xlink-2003-12-31.xsd")) new URI("http://www.xbrl.org/2003/xlink-2003-12-31.xsd")
-      else uri
+      val prefixToStrip =
+        classOf[LinkbaseTest].getResource("/taxonomyrootdir").toURI.getPath.dropWhile(_ == '/')
+      val pathWithoutPrefix =
+        uri.getPath.dropWhile(_ == '/').stripPrefix(prefixToStrip).dropWhile(_ == '/')
+
+      if (pathWithoutPrefix.size == uri.getPath.dropWhile(_ == '/').size) uri
+      else {
+        val (host, path) = pathWithoutPrefix.span(_ != '/')
+
+        val newUri = new URI(s"http://${host}/${path.dropWhile(_ == '/')}")
+        newUri
+      }
     }
   }
 
-  private val commonFileUris: Vector[URI] = {
-    Vector("xbrl-instance-2003-12-31.xsd", "xbrl-linkbase-2003-12-31.xsd", "xl-2003-12-31.xsd", "xlink-2003-12-31.xsd") map { uri =>
-      classOf[LinkbaseTest].getResource(s"/$uri").toURI
+  private def findFiles(rootDir: File): Vector[File] = {
+    require(rootDir.isDirectory)
+    rootDir.listFiles.toVector flatMap {
+      case f: File if f.isFile => Vector(f)
+      case d: File if d.isDirectory =>
+        // Recursive call
+        findFiles(d)
+      case _ => Vector()
     }
   }
+
+  private val taxoRootDir = new File(classOf[LinkbaseTest].getResource("/taxonomyrootdir").toURI)
+
+  private val confSuiteRootDir = new File(classOf[LinkbaseTest].getResource("/XBRL-CONF-CR5-2012-01-24").toURI)
 }
