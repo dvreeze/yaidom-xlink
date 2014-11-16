@@ -17,11 +17,17 @@
 package eu.cdevreeze.yaidom
 
 /**
- * XLinks, wrapping an [[eu.cdevreeze.yaidom.simple.Elem]]. The XLink support is without any support for XPointer.
+ * This package models XBRL linkbases.
  *
- * This package will be phased out. It only wraps simple elements, and is less useful directly in an XBRL context,
- * because of many optional attributes that are mandatory in an XBRL context.
+ * The model can be populated if it obeys the relevant schema: xbrl-linkbase-2003-12-31.xsd (which imports
+ * xl-2003-12-31.xsd and xlink-2003-12-31.xsd).
+ *
+ * The "DOM backend" is pluggable as long as there is a `DocawareBridgeElem` bridge for it.
+ *
+ * The model is aware of xsi:nil, XML Base and XPointer (as restricted by XBRL).
+ * 
+ * The model is easy to use inside other projects (using yaidom) for parts of the data.
  *
  * @author Chris de Vreeze
  */
-package object xlink
+package object link

@@ -17,11 +17,10 @@
 package eu.cdevreeze.yaidom
 
 /**
- * XLinks, wrapping an [[eu.cdevreeze.yaidom.simple.Elem]]. The XLink support is without any support for XPointer.
+ * This package models XLink in the context of XBRL, as a purely abstract API.
  *
- * This package will be phased out. It only wraps simple elements, and is less useful directly in an XBRL context,
- * because of many optional attributes that are mandatory in an XBRL context.
+ * The model follows the following schema: xl-2003-12-31.xsd (which imports xlink-2003-12-31.xsd).
  *
  * @author Chris de Vreeze
  */
-package object xlink
+package object xl
