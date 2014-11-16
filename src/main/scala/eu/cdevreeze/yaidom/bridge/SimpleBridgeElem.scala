@@ -22,8 +22,10 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.queryapi.IsNavigableApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 
 /**
  * Bridge element that enables the `ScopedElemLike with IsNavigableLike` API (and more) on the classes delegating to this bridge element.
@@ -77,4 +79,41 @@ trait SimpleBridgeElem extends Any {
   // Extra methods
 
   def toElem: eu.cdevreeze.yaidom.simple.Elem
+}
+
+object SimpleBridgeElem {
+
+  /**
+   * Wrapper for the bridge element that itself offers the query API. Of course this is not a value class instance.
+   */
+  final class WithQueryApi(val bridge: SimpleBridgeElem) extends SimpleBridgeElem with ScopedElemLike[WithQueryApi] with IsNavigable[WithQueryApi] { self: WithQueryApi =>
+
+    final override type BackingElem = bridge.BackingElem
+
+    final override type SelfType = WithQueryApi
+
+    final def backingElem: BackingElem = bridge.backingElem
+
+    final def findAllChildElems: immutable.IndexedSeq[WithQueryApi] = {
+      bridge.findAllChildElems.map(e => new WithQueryApi(e))
+    }
+
+    final def resolvedName: EName = bridge.resolvedName
+
+    final def resolvedAttributes: immutable.Iterable[(EName, String)] = bridge.resolvedAttributes
+
+    final def qname: QName = bridge.qname
+
+    final def attributes: immutable.Iterable[(QName, String)] = bridge.attributes
+
+    final def scope: Scope = bridge.scope
+
+    final def text: String = bridge.text
+
+    final def findChildElemByPathEntry(entry: Path.Entry): Option[WithQueryApi] = {
+      bridge.findChildElemByPathEntry(entry).map(e => new WithQueryApi(e))
+    }
+
+    final def toElem: eu.cdevreeze.yaidom.simple.Elem = bridge.toElem
+  }
 }

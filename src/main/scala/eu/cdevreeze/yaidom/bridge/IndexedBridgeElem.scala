@@ -16,9 +16,16 @@
 
 package eu.cdevreeze.yaidom.bridge
 
+import scala.collection.immutable
+
+import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.queryapi.IsNavigableApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 
 /**
  * Bridge element that extends `SimpleBridgeElem` with "indexing".
@@ -54,4 +61,49 @@ trait IndexedBridgeElem extends Any with SimpleBridgeElem {
   def path: Path
 
   def unwrappedBackingElem: UnwrappedBackingElem
+}
+
+object IndexedBridgeElem {
+
+  /**
+   * Wrapper for the bridge element that itself offers the query API. Of course this is not a value class instance.
+   */
+  final class WithQueryApi(val bridge: IndexedBridgeElem) extends IndexedBridgeElem with ScopedElemLike[WithQueryApi] with IsNavigable[WithQueryApi] { self: WithQueryApi =>
+
+    final override type BackingElem = bridge.BackingElem
+
+    final override type SelfType = WithQueryApi
+
+    final override type UnwrappedBackingElem = bridge.UnwrappedBackingElem
+
+    final def backingElem: BackingElem = bridge.backingElem
+
+    final def findAllChildElems: immutable.IndexedSeq[WithQueryApi] = {
+      bridge.findAllChildElems.map(e => new WithQueryApi(e))
+    }
+
+    final def resolvedName: EName = bridge.resolvedName
+
+    final def resolvedAttributes: immutable.Iterable[(EName, String)] = bridge.resolvedAttributes
+
+    final def qname: QName = bridge.qname
+
+    final def attributes: immutable.Iterable[(QName, String)] = bridge.attributes
+
+    final def scope: Scope = bridge.scope
+
+    final def text: String = bridge.text
+
+    final def findChildElemByPathEntry(entry: Path.Entry): Option[WithQueryApi] = {
+      bridge.findChildElemByPathEntry(entry).map(e => new WithQueryApi(e))
+    }
+
+    final def toElem: eu.cdevreeze.yaidom.simple.Elem = bridge.toElem
+
+    final def rootElem: UnwrappedBackingElem = bridge.rootElem
+
+    final def path: Path = bridge.path
+
+    final def unwrappedBackingElem: UnwrappedBackingElem = bridge.unwrappedBackingElem
+  }
 }

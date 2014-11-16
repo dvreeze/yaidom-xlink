@@ -362,6 +362,32 @@ abstract class Locator private[link] (
 
   final def titleXLinks: immutable.IndexedSeq[Title] =
     findAllChildElemsOfType(classTag[Title])
+
+  /**
+   * Resolves the href of this locator against the given "taxonomy". If the href cannot be resolved, an
+   * exception is thrown.
+   *
+   * This method may be too slow to use in bulk.
+   */
+  final def resolveHref(implicit taxonomy: Taxonomy): XmlFragmentKey = {
+    val baseUri = bridgeElem.baseUri
+    val absoluteUri = baseUri.resolve(href)
+    require(absoluteUri.isAbsolute, s"Href $href does not resolve to an absolute URI")
+
+    val absoluteUriWithoutFragment = new URI(absoluteUri.getScheme, absoluteUri.getSchemeSpecificPart, null)
+    val fragment = absoluteUri.getFragment
+
+    val taxoDoc =
+      taxonomy.docsByUri.getOrElse(absoluteUriWithoutFragment, sys.error(s"Href $href (ignoring the optional fragment) could not be resolved"))
+
+    if (fragment == null) XmlFragmentKey(taxoDoc.docElem.docUri, taxoDoc.docElem.path)
+    else {
+      // TODO XPointer
+      val xmlFragmentKey =
+        taxoDoc.xmlFragmentKeysById.getOrElse(fragment, sys.error(s"The fragment in href $href could not be resolved"))
+      xmlFragmentKey
+    }
+  }
 }
 
 final class StandardLocator private[link] (

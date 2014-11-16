@@ -66,7 +66,13 @@ class DefaultDocawareBridgeElem(val backingElem: docaware.Elem) extends AnyVal w
 
   final def unwrappedBackingElem: UnwrappedBackingElem = backingElem.elem
 
-  final def baseUri: URI = backingElem.baseUri
+  final def baseUri: URI = {
+    val result = backingElem.baseUri
+    // The base URI must be absolute, but that is not checked here
+    result
+  }
+
+  final def docUri: URI = backingElem.docUri
 }
 
 object DefaultDocawareBridgeElem {

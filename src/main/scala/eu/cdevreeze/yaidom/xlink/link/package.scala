@@ -85,4 +85,6 @@ package object link {
   val OrderEName = EName("order")
   val UseEName = EName("use")
   val PriorityEName = EName("priority")
+
+  val IdEName = EName("id")
 }
