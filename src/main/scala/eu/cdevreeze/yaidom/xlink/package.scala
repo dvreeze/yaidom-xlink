@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom
 
 /**
- * XLinks, wrapping an [[eu.cdevreeze.yaidom.simple.Elem]]. The XLink support is without any support for XPointer.
+ * XLinks, wrapping a yaidom "simple element". The XLink support is without any support for XPointer.
  *
  * This package will be phased out. It only wraps simple elements, and is less useful directly in an XBRL context,
  * because of many optional attributes that are mandatory in an XBRL context.

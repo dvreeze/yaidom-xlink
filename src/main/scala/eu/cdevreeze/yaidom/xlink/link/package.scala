@@ -16,6 +16,9 @@
 
 package eu.cdevreeze.yaidom.xlink
 
+import eu.cdevreeze.yaidom.core.EName
+import java.net.URI
+
 /**
  * This package models XBRL linkbases.
  *
@@ -25,9 +28,56 @@ package eu.cdevreeze.yaidom.xlink
  * The "DOM backend" is pluggable as long as there is a `DocawareBridgeElem` bridge for it.
  *
  * The model is aware of xsi:nil, XML Base and XPointer (as restricted by XBRL).
- * 
+ *
  * The model is easy to use inside other projects (using yaidom) for parts of the data.
  *
  * @author Chris de Vreeze
  */
-package object link
+package object link {
+
+  val LinkNamespace = URI.create("http://www.xbrl.org/2003/linkbase").toString
+  val GenNamespace = URI.create("http://xbrl.org/2008/generic").toString
+  val LabelNamespace = URI.create("http://xbrl.org/2008/label").toString
+  val ReferenceNamespace = URI.create("http://xbrl.org/2008/reference").toString
+
+  val LinkLinkbaseEName = EName(LinkNamespace, "linkbase")
+
+  val LinkDocumentationEName = EName(LinkNamespace, "documentation")
+
+  val LinkLocEName = EName(LinkNamespace, "loc")
+
+  val LinkLabelArcEName = EName(LinkNamespace, "labelArc")
+  val LinkReferenceArcEName = EName(LinkNamespace, "referenceArc")
+  val LinkCalculationArcEName = EName(LinkNamespace, "calculationArc")
+  val LinkPresentationArcEName = EName(LinkNamespace, "presentationArc")
+  val LinkDefinitionArcEName = EName(LinkNamespace, "definitionArc")
+
+  val LinkFootnoteArcEName = EName(LinkNamespace, "footnoteArc")
+
+  val LinkLabelEName = EName(LinkNamespace, "label")
+  val LinkReferenceEName = EName(LinkNamespace, "reference")
+  val LinkFootnoteEName = EName(LinkNamespace, "footnote")
+
+  val LinkLabelLinkEName = EName(LinkNamespace, "labelLink")
+  val LinkReferenceLinkEName = EName(LinkNamespace, "referenceLink")
+  val LinkCalculationLinkEName = EName(LinkNamespace, "calculationLink")
+  val LinkPresentationLinkEName = EName(LinkNamespace, "presentationLink")
+  val LinkDefinitionLinkEName = EName(LinkNamespace, "definitionLink")
+
+  val LinkFootnoteLinkEName = EName(LinkNamespace, "footnoteLink")
+
+  val LinkLinkbaseRefEName = EName(LinkNamespace, "linkbaseRef")
+  val LinkSchemaRefEName = EName(LinkNamespace, "schemaRef")
+  val LinkRoleRefEName = EName(LinkNamespace, "roleRef")
+  val LinkArcroleRefEName = EName(LinkNamespace, "arcroleRef")
+
+  val LinkDefinitionEName = EName(LinkNamespace, "definition")
+  val LinkUsedOnEName = EName(LinkNamespace, "usedOn")
+  val LinkRoleTypeEName = EName(LinkNamespace, "roleType")
+  val LinkArcroleTypeEName = EName(LinkNamespace, "arcroleType")
+
+  val GenArcEName = EName(GenNamespace, "arc")
+
+  val LabelLabelEName = EName(LabelNamespace, "label")
+  val ReferenceReferenceEName = EName(ReferenceNamespace, "reference")
+}

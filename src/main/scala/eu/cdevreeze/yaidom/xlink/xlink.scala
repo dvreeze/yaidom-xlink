@@ -25,7 +25,7 @@ import eu.cdevreeze.yaidom.simple.Elem
 import XLink._
 
 /**
- * Immutable XLink. See See http://www.w3.org/TR/xlink11/. An `XLink` wraps a yaidom [[eu.cdevreeze.yaidom.simple.Elem]].
+ * Immutable XLink. See See http://www.w3.org/TR/xlink11/. An `XLink` wraps a yaidom "simple element".
  * The XLink support is without any support for XPointer.
  *
  * @author Chris de Vreeze

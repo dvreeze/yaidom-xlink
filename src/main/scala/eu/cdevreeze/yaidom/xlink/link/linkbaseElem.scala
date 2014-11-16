@@ -78,7 +78,7 @@ final class Linkbase private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkLinkbaseEName)
+  require(resolvedName == LinkLinkbaseEName)
 
   final def extendedLinks: immutable.IndexedSeq[ExtendedLink] =
     findAllChildElemsOfType(classTag[ExtendedLink])
@@ -178,7 +178,7 @@ final class LabelLink private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkLabelLinkEName)
+  require(resolvedName == LinkLabelLinkEName)
 
   // Can have title, documentation, loc, labelArc and label children
 }
@@ -187,7 +187,7 @@ final class ReferenceLink private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkReferenceLinkEName)
+  require(resolvedName == LinkReferenceLinkEName)
 
   // Can have title, documentation, loc, referenceArc and reference children
 }
@@ -196,7 +196,7 @@ final class CalculationLink private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkCalculationLinkEName)
+  require(resolvedName == LinkCalculationLinkEName)
 
   // Can have title, documentation, loc and calculationArc children
 }
@@ -205,7 +205,7 @@ final class PresentationLink private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkPresentationLinkEName)
+  require(resolvedName == LinkPresentationLinkEName)
 
   // Can have title, documentation, loc and presentationArc children
 }
@@ -214,7 +214,7 @@ final class DefinitionLink private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkDefinitionLinkEName)
+  require(resolvedName == LinkDefinitionLinkEName)
 
   // Can have title, documentation, loc and definitionArc children
 }
@@ -223,7 +223,7 @@ final class FootnoteLink private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkFootnoteLinkEName)
+  require(resolvedName == LinkFootnoteLinkEName)
 
   // Can have title, documentation, loc, footnoteArc and footnote children
 }
@@ -277,28 +277,28 @@ class GenericArc private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends Arc(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.GenArcEName)
+  require(resolvedName == GenArcEName)
 }
 
 final class LabelArc private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkLabelArcEName)
+  require(resolvedName == LinkLabelArcEName)
 }
 
 final class ReferenceArc private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkReferenceArcEName)
+  require(resolvedName == LinkReferenceArcEName)
 }
 
 final class CalculationArc private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkCalculationArcEName)
+  require(resolvedName == LinkCalculationArcEName)
 
   // Must have weight attribute
 }
@@ -307,7 +307,7 @@ final class PresentationArc private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkPresentationArcEName)
+  require(resolvedName == LinkPresentationArcEName)
 
   // Can have preferredLabel attribute
 }
@@ -316,14 +316,14 @@ final class DefinitionArc private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkDefinitionArcEName)
+  require(resolvedName == LinkDefinitionArcEName)
 }
 
 final class FootnoteArc private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkFootnoteArcEName)
+  require(resolvedName == LinkFootnoteArcEName)
 }
 
 // Locators
@@ -358,7 +358,7 @@ final class StandardLocator private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends Locator(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkLocEName)
+  require(resolvedName == LinkLocEName)
 }
 
 // Resources
@@ -398,35 +398,35 @@ final class LabelResource private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardResource(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkLabelEName)
+  require(resolvedName == LinkLabelEName)
 }
 
 final class ReferenceResource private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardResource(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkReferenceEName)
+  require(resolvedName == LinkReferenceEName)
 }
 
 final class FootnoteResource private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardResource(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkFootnoteEName)
+  require(resolvedName == LinkFootnoteEName)
 }
 
 final class GenericLabelResource private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends GenericResource(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LabelLabelEName)
+  require(resolvedName == LabelLabelEName)
 }
 
 final class GenericReferenceResource private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends GenericResource(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.ReferenceReferenceEName)
+  require(resolvedName == ReferenceReferenceEName)
 }
 
 // Miscellaneous
@@ -435,14 +435,14 @@ final class Documentation private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkDocumentationEName)
+  require(resolvedName == LinkDocumentationEName)
 }
 
 final class LinkbaseRef private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends SimpleLink(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkLinkbaseRefEName)
+  require(resolvedName == LinkLinkbaseRefEName)
 
   // Must have arcrole attribute
 }
@@ -451,14 +451,14 @@ final class SchemaRef private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends SimpleLink(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkSchemaRefEName)
+  require(resolvedName == LinkSchemaRefEName)
 }
 
 final class RoleRef private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends SimpleLink(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkRoleRefEName)
+  require(resolvedName == LinkRoleRefEName)
 
   // Must have roleURI attribute
 }
@@ -467,7 +467,7 @@ final class ArcroleRef private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends SimpleLink(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkArcroleRefEName)
+  require(resolvedName == LinkArcroleRefEName)
 
   // Must have arcroleURI attribute
 }
@@ -476,21 +476,21 @@ final class Definition private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkDefinitionEName)
+  require(resolvedName == LinkDefinitionEName)
 }
 
 final class UsedOn private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkUsedOnEName)
+  require(resolvedName == LinkUsedOnEName)
 }
 
 final class RoleType private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkRoleTypeEName)
+  require(resolvedName == LinkRoleTypeEName)
 
   // Has at most one definition and at least one unsedOn. Has roleURI attribute.
 }
@@ -499,58 +499,12 @@ final class ArcroleType private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(bridgeElem, childElems) {
 
-  require(resolvedName == LinkbaseElem.LinkArcroleTypeEName)
+  require(resolvedName == LinkArcroleTypeEName)
 
   // Has at most one definition and at least one unsedOn. Has arcroleURI and cyclesAllowed attributes.
 }
 
-// Constants etc.
+// Factories.
 
 object LinkbaseElem {
-
-  val LinkNamespace = URI.create("http://www.xbrl.org/2003/linkbase").toString
-  val GenNamespace = URI.create("http://xbrl.org/2008/generic").toString
-  val LabelNamespace = URI.create("http://xbrl.org/2008/label").toString
-  val ReferenceNamespace = URI.create("http://xbrl.org/2008/reference").toString
-
-  val LinkLinkbaseEName = EName(LinkNamespace, "linkbase")
-
-  val LinkDocumentationEName = EName(LinkNamespace, "documentation")
-
-  val LinkLocEName = EName(LinkNamespace, "loc")
-
-  val LinkLabelArcEName = EName(LinkNamespace, "labelArc")
-  val LinkReferenceArcEName = EName(LinkNamespace, "referenceArc")
-  val LinkCalculationArcEName = EName(LinkNamespace, "calculationArc")
-  val LinkPresentationArcEName = EName(LinkNamespace, "presentationArc")
-  val LinkDefinitionArcEName = EName(LinkNamespace, "definitionArc")
-
-  val LinkFootnoteArcEName = EName(LinkNamespace, "footnoteArc")
-
-  val LinkLabelEName = EName(LinkNamespace, "label")
-  val LinkReferenceEName = EName(LinkNamespace, "reference")
-  val LinkFootnoteEName = EName(LinkNamespace, "footnote")
-
-  val LinkLabelLinkEName = EName(LinkNamespace, "labelLink")
-  val LinkReferenceLinkEName = EName(LinkNamespace, "referenceLink")
-  val LinkCalculationLinkEName = EName(LinkNamespace, "calculationLink")
-  val LinkPresentationLinkEName = EName(LinkNamespace, "presentationLink")
-  val LinkDefinitionLinkEName = EName(LinkNamespace, "definitionLink")
-
-  val LinkFootnoteLinkEName = EName(LinkNamespace, "footnoteLink")
-
-  val LinkLinkbaseRefEName = EName(LinkNamespace, "linkbaseRef")
-  val LinkSchemaRefEName = EName(LinkNamespace, "schemaRef")
-  val LinkRoleRefEName = EName(LinkNamespace, "roleRef")
-  val LinkArcroleRefEName = EName(LinkNamespace, "arcroleRef")
-
-  val LinkDefinitionEName = EName(LinkNamespace, "definition")
-  val LinkUsedOnEName = EName(LinkNamespace, "usedOn")
-  val LinkRoleTypeEName = EName(LinkNamespace, "roleType")
-  val LinkArcroleTypeEName = EName(LinkNamespace, "arcroleType")
-
-  val GenArcEName = EName(GenNamespace, "arc")
-
-  val LabelLabelEName = EName(LabelNamespace, "label")
-  val ReferenceReferenceEName = EName(ReferenceNamespace, "reference")
 }
