@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.link
+package eu.cdevreeze.yaidom.xlink.link
 
 import java.net.URI
 
@@ -31,7 +31,7 @@ import eu.cdevreeze.yaidom.queryapi.IsNavigable
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 import eu.cdevreeze.yaidom.simple
-import eu.cdevreeze.yaidom.xl
+import eu.cdevreeze.yaidom.xlink.xl
 
 /**
  * XBRL linkbase content. See xbrl-linkbase-2003-12-31.xsd (for standard XBRL).
@@ -276,6 +276,8 @@ abstract class StandardArc private[link] (
 class GenericArc private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends Arc(bridgeElem, childElems) {
+
+  require(resolvedName == LinkbaseElem.GenArcEName)
 }
 
 final class LabelArc private[link] (
@@ -413,6 +415,20 @@ final class FootnoteResource private[link] (
   require(resolvedName == LinkbaseElem.LinkFootnoteEName)
 }
 
+final class GenericLabelResource private[link] (
+  bridgeElem: DocawareBridgeElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends GenericResource(bridgeElem, childElems) {
+
+  require(resolvedName == LinkbaseElem.LabelLabelEName)
+}
+
+final class GenericReferenceResource private[link] (
+  bridgeElem: DocawareBridgeElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends GenericResource(bridgeElem, childElems) {
+
+  require(resolvedName == LinkbaseElem.ReferenceReferenceEName)
+}
+
 // Miscellaneous
 
 final class Documentation private[link] (
@@ -493,6 +509,9 @@ final class ArcroleType private[link] (
 object LinkbaseElem {
 
   val LinkNamespace = URI.create("http://www.xbrl.org/2003/linkbase").toString
+  val GenNamespace = URI.create("http://xbrl.org/2008/generic").toString
+  val LabelNamespace = URI.create("http://xbrl.org/2008/label").toString
+  val ReferenceNamespace = URI.create("http://xbrl.org/2008/reference").toString
 
   val LinkLinkbaseEName = EName(LinkNamespace, "linkbase")
 
@@ -529,4 +548,9 @@ object LinkbaseElem {
   val LinkUsedOnEName = EName(LinkNamespace, "usedOn")
   val LinkRoleTypeEName = EName(LinkNamespace, "roleType")
   val LinkArcroleTypeEName = EName(LinkNamespace, "arcroleType")
+
+  val GenArcEName = EName(GenNamespace, "arc")
+
+  val LabelLabelEName = EName(LabelNamespace, "label")
+  val ReferenceReferenceEName = EName(ReferenceNamespace, "reference")
 }

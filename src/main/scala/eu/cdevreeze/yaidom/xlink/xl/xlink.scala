@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.xl
+package eu.cdevreeze.yaidom.xlink.xl
 
 import java.net.URI
 
