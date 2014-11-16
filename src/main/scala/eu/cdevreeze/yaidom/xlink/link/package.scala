@@ -16,8 +16,9 @@
 
 package eu.cdevreeze.yaidom.xlink
 
-import eu.cdevreeze.yaidom.core.EName
 import java.net.URI
+
+import eu.cdevreeze.yaidom.core.EName
 
 /**
  * This package models XBRL linkbases.
@@ -80,4 +81,8 @@ package object link {
 
   val LabelLabelEName = EName(LabelNamespace, "label")
   val ReferenceReferenceEName = EName(ReferenceNamespace, "reference")
+
+  val OrderEName = EName("order")
+  val UseEName = EName("use")
+  val PriorityEName = EName("priority")
 }

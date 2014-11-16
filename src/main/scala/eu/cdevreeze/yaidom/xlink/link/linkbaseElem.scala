@@ -34,11 +34,21 @@ import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.xlink.xl
 
 /**
- * XBRL linkbase content. See xbrl-linkbase-2003-12-31.xsd (for standard XBRL).
+ * XBRL linkbase content, as sub-classes of `LinkbaseElem`, which is an arbitrary element in a linkbase.
+ * See xbrl-linkbase-2003-12-31.xsd (for standard XBRL).
+ *
+ * The `LinkbaseElem` type hierarchy also knows about generic links and generic label and reference links in particular.
+ * For other generic link content, the user may want to define own (implicit) classes for ease of use, taking the
+ * data of the underlying LinkbaseElem, such as a GenericResource.
+ *
+ * Moreover, some `LinkbaseElem` objects such as footnotes occur in XBRL instances, not in XBRL taxonomies. The user may
+ * want to make it easy to populate the specific LinkbaseElems from those elements. This should be quite easy if
+ * for XBRL instances the "same elements" are used, so either they also use `DocawareBridgeElem` instances, or they use
+ * backing element implementations that are compatible with the `DocawareBridgeElem` abstraction.
  *
  * @author Chris de Vreeze
  */
-sealed class LinkbaseElem private[link] (
+sealed abstract class LinkbaseElem private[link] (
   val bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends ScopedElemLike[LinkbaseElem] with IsNavigable[LinkbaseElem] with SubtypeAwareElemLike[LinkbaseElem] {
 
@@ -96,7 +106,7 @@ abstract class XLink private[link] (
     resolvedAttributes.toVector filter { case (ename, value) => ename.namespaceUriOption == Some(xl.XLink.XLinkNamespace) }
 }
 
-abstract class SimpleLink private[link] (
+class SimpleLink private[link] (
   bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(bridgeElem, childElems) with xl.SimpleLink {
 
@@ -151,8 +161,8 @@ abstract class ExtendedLink private[link] (
 
   final def titleOption: Option[String] = attributeOption(xl.XLink.XLinkTitleEName)
 
-  final def titleXLinks: immutable.IndexedSeq[XLink with xl.Title] =
-    findAllChildElemsOfType(classTag[XLink with xl.Title])
+  final def titleXLinks: immutable.IndexedSeq[Title] =
+    findAllChildElemsOfType(classTag[Title])
 
   final def locatorXLinks: immutable.IndexedSeq[Locator] =
     findAllChildElemsOfType(classTag[Locator])
@@ -256,16 +266,16 @@ abstract class Arc private[link] (
 
   final def actuateOption: Option[String] = attributeOption(xl.XLink.XLinkActuateEName)
 
-  final def titleXLinks: immutable.IndexedSeq[LinkbaseElem with xl.Title] =
-    findAllChildElemsOfType(classTag[LinkbaseElem with xl.Title])
+  final def titleXLinks: immutable.IndexedSeq[Title] =
+    findAllChildElemsOfType(classTag[Title])
 
   final def orderOption: Option[BigDecimal] =
-    attributeOption(EName("order")).map(v => BigDecimal(v))
+    attributeOption(OrderEName).map(v => BigDecimal(v))
 
   final def useOption: Option[xl.XLink.Use] =
-    attributeOption(EName("use")).map(v => xl.XLink.Use.fromString(v))
+    attributeOption(UseEName).map(v => xl.XLink.Use.fromString(v))
 
-  final def priorityOption: Option[Int] = attributeOption(EName("priority")).map(_.toInt)
+  final def priorityOption: Option[Int] = attributeOption(PriorityEName).map(_.toInt)
 }
 
 abstract class StandardArc private[link] (
@@ -350,8 +360,8 @@ abstract class Locator private[link] (
 
   final def titleOption: Option[String] = attributeOption(xl.XLink.XLinkTitleEName)
 
-  final def titleXLinks: immutable.IndexedSeq[LinkbaseElem with xl.Title] =
-    findAllChildElemsOfType(classTag[LinkbaseElem with xl.Title])
+  final def titleXLinks: immutable.IndexedSeq[Title] =
+    findAllChildElemsOfType(classTag[Title])
 }
 
 final class StandardLocator private[link] (
@@ -427,6 +437,15 @@ final class GenericReferenceResource private[link] (
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends GenericResource(bridgeElem, childElems) {
 
   require(resolvedName == ReferenceReferenceEName)
+}
+
+// Title
+
+class Title private[link] (
+  bridgeElem: DocawareBridgeElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(bridgeElem, childElems) with xl.Title {
+
+  final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeTitle
 }
 
 // Miscellaneous
@@ -507,4 +526,93 @@ final class ArcroleType private[link] (
 // Factories.
 
 object LinkbaseElem {
+
+  /** Creates a LinkbaseElem. This method is rather expensive. */
+  def apply(elem: DocawareBridgeElem): LinkbaseElem = {
+    // Recursive calls
+    val childElems = elem.findAllChildElems.map(e => apply(e))
+    apply(elem, childElems)
+  }
+
+  private[link] def apply(elem: DocawareBridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): LinkbaseElem = {
+    elem.backingElem.attributeOption(xl.XLink.XLinkTypeEName) match {
+      case Some("extended") => applyForExtendedLink(elem, childElems)
+      case Some("simple") => applyForSimpleLink(elem, childElems)
+      case Some("arc") => applyForArc(elem, childElems)
+      case Some("locator") => applyForLocator(elem, childElems)
+      case Some("resource") => applyForResource(elem, childElems)
+      case Some("title") => new Title(elem, childElems)
+      case Some(_) => sys.error(s"Not an XLink. Element name ${elem.resolvedName}")
+      case None => elem.resolvedName match {
+        case LinkLinkbaseEName => new Linkbase(elem, childElems)
+        case LinkRoleTypeEName => new RoleType(elem, childElems)
+        case LinkArcroleTypeEName => new ArcroleType(elem, childElems)
+        case LinkDefinitionEName => new Definition(elem, childElems)
+        case LinkDocumentationEName => new Documentation(elem, childElems)
+        case LinkUsedOnEName => new UsedOn(elem, childElems)
+        case _ => new LinkbaseElem(elem, childElems) {}
+      }
+    }
+  }
+
+  private[link] def applyForExtendedLink(elem: DocawareBridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): ExtendedLink = {
+    elem.resolvedName match {
+      case LinkLabelLinkEName => new LabelLink(elem, childElems)
+      case LinkReferenceLinkEName => new ReferenceLink(elem, childElems)
+      case LinkCalculationLinkEName => new CalculationLink(elem, childElems)
+      case LinkPresentationLinkEName => new PresentationLink(elem, childElems)
+      case LinkDefinitionEName => new DefinitionLink(elem, childElems)
+      case LinkFootnoteLinkEName => new FootnoteLink(elem, childElems)
+      case _ => new GenericLink(elem, childElems)
+    }
+  }
+
+  private[link] def applyForSimpleLink(elem: DocawareBridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): SimpleLink = {
+    elem.resolvedName match {
+      case LinkSchemaRefEName => new SchemaRef(elem, childElems)
+      case LinkLinkbaseRefEName => new LinkbaseRef(elem, childElems)
+      case LinkRoleRefEName => new RoleRef(elem, childElems)
+      case LinkArcroleRefEName => new ArcroleRef(elem, childElems)
+      case _ => new SimpleLink(elem, childElems)
+    }
+  }
+
+  private[link] def applyForArc(elem: DocawareBridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): Arc = {
+    elem.resolvedName match {
+      case LinkLabelArcEName => new LabelArc(elem, childElems)
+      case LinkReferenceArcEName => new ReferenceArc(elem, childElems)
+      case LinkCalculationArcEName => new CalculationArc(elem, childElems)
+      case LinkPresentationArcEName => new PresentationArc(elem, childElems)
+      case LinkDefinitionArcEName => new DefinitionArc(elem, childElems)
+      case LinkFootnoteArcEName => new FootnoteArc(elem, childElems)
+      case GenArcEName => new GenericArc(elem, childElems)
+      case _ => sys.error(s"Not recognized as arc: ${elem.resolvedName}")
+    }
+  }
+
+  private[link] def applyForLocator(elem: DocawareBridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): Locator = {
+    elem.resolvedName match {
+      case LinkLocEName => new StandardLocator(elem, childElems)
+      case _ => sys.error(s"Not recognized as locator: ${elem.resolvedName}")
+    }
+  }
+
+  private[link] def applyForResource(elem: DocawareBridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): Resource = {
+    elem.resolvedName match {
+      case LinkLabelEName => new LabelResource(elem, childElems)
+      case LinkReferenceEName => new ReferenceResource(elem, childElems)
+      case LinkFootnoteEName => new FootnoteResource(elem, childElems)
+      case LabelLabelEName => new GenericLabelResource(elem, childElems)
+      case ReferenceReferenceEName => new GenericReferenceResource(elem, childElems)
+      case _ => new GenericResource(elem, childElems)
+    }
+  }
+}
+
+object Linkbase {
+
+  /** Creates a Linkbase. This method is rather expensive. */
+  def apply(elem: DocawareBridgeElem): Linkbase = {
+    new Linkbase(elem, elem.findAllChildElems.map(e => LinkbaseElem(e)))
+  }
 }
