@@ -27,8 +27,27 @@ package eu.cdevreeze.yaidom
  * API and implementation according to the needs of that project.
  *
  * Currently these common bridge element APIs and implementations live in the XLink project, but maybe in the
- * future they belong in the core yaidom project (so that no longer a dependency on this project is needed
+ * future they belong to the core yaidom project (so that no longer a dependency on this project is needed
  * if XLink support itself is not needed).
+ *
+ * ==Design notes==
+ *
+ * Why do we need all this wrapping? After all, a simple element is wrapped in a more general `DefaultSimpleBridgeElem`
+ * (probably without any object creation costs), which is wrapped in a `SimpleWrapperElem` if you need the yaidom
+ * query API on the "bridge element".
+ *
+ * Had the yaidom query API traits been implemented using abstract types instead of type parameters, we would not have
+ * needed to bridge between the use of generics for query API traits and the absence of generics in the bridge and
+ * wrapper elements.
+ *
+ * On the other hand, it turned out to be far easier and more natural to model F-bounded polymorphism in the query API
+ * traits using generics than using abstract types. This is not surprising: generics introduce a family of types
+ * (which is indeed what the query API traits "are"), whereas abstract types just introduce a (type) member to one type.
+ * In particular, it is natural to think of `ScopedElemApi` as the existential type:
+ * {{{
+ * ScopedElemApi[E] forSome { type E }
+ * }}}
+ * Existential types have been avoided in yaidom and yaidom-xlink, however.
  *
  * @author Chris de Vreeze
  */

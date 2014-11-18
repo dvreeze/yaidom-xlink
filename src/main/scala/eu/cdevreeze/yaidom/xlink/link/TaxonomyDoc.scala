@@ -16,16 +16,16 @@
 
 package eu.cdevreeze.yaidom.xlink.link
 
-import eu.cdevreeze.yaidom.docaware
-import eu.cdevreeze.yaidom.bridge.DocawareBridgeElem
 import eu.cdevreeze.yaidom.bridge.DefaultDocawareBridgeElem
+import eu.cdevreeze.yaidom.bridge.DocawareWrapperElem
+import eu.cdevreeze.yaidom.docaware
 
 /**
  * Taxonomy document, in which XML fragments can quickly be found using IDs as keys.
  *
  * @author Chris de Vreeze
  */
-final class TaxonomyDoc(val docElem: DocawareBridgeElem.WithQueryApi) {
+final class TaxonomyDoc(val docElem: DocawareWrapperElem) {
 
   val xmlFragmentKeysById: Map[String, XmlFragmentKey] = {
     val result =
@@ -40,7 +40,7 @@ object TaxonomyDoc {
 
   def fromDocawareElem(elem: docaware.Elem): TaxonomyDoc = {
     val docElem =
-      new DocawareBridgeElem.WithQueryApi(
+      new DocawareWrapperElem(
         new DefaultDocawareBridgeElem(elem))
     new TaxonomyDoc(docElem)
   }
