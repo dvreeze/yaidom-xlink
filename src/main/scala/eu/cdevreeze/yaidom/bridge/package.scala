@@ -43,7 +43,7 @@ package eu.cdevreeze.yaidom
  * On the other hand, it turned out to be far easier and more natural to model F-bounded polymorphism in the query API
  * traits using generics than using abstract types. This is not surprising: generics introduce a family of types
  * (which is indeed what the query API traits "are"), whereas abstract types just introduce a (type) member to one type.
- * In particular, it is natural to think of `ScopedElemApi` as the existential type:
+ * In particular, it is natural to think of one "instance of type" `ScopedElemApi` as the existential type:
  * {{{
  * ScopedElemApi[E] forSome { type E }
  * }}}
