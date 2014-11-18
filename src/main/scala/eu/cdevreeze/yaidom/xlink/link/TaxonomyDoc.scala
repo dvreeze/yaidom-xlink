@@ -16,32 +16,19 @@
 
 package eu.cdevreeze.yaidom.xlink.link
 
-import eu.cdevreeze.yaidom.bridge.DefaultDocawareBridgeElem
 import eu.cdevreeze.yaidom.bridge.DocawareWrapperElem
-import eu.cdevreeze.yaidom.docaware
 
 /**
  * Taxonomy document, in which XML fragments can quickly be found using IDs as keys.
  *
  * @author Chris de Vreeze
  */
-final class TaxonomyDoc(val docElem: DocawareWrapperElem) {
+trait TaxonomyDoc {
 
-  val xmlFragmentKeysById: Map[String, XmlFragmentKey] = {
-    val result =
-      docElem.filterElemsOrSelf(_.attributeOption(IdEName).isDefined) map { elem =>
-        elem.attribute(IdEName) -> XmlFragmentKey(elem.docUri, elem.path)
-      }
-    result.toMap
-  }
-}
+  def docElem: DocawareWrapperElem
 
-object TaxonomyDoc {
-
-  def fromDocawareElem(elem: docaware.Elem): TaxonomyDoc = {
-    val docElem =
-      new DocawareWrapperElem(
-        new DefaultDocawareBridgeElem(elem))
-    new TaxonomyDoc(docElem)
-  }
+  /**
+   * Map from IDs to XML fragments. This should be a stored value in TaxonomyDoc implementations.
+   */
+  def xmlFragmentKeysById: Map[String, XmlFragmentKey]
 }

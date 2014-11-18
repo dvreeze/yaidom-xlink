@@ -20,6 +20,7 @@ import java.io.File
 import java.net.URI
 
 import scala.Vector
+import scala.collection.immutable
 import scala.reflect.classTag
 
 import org.junit.Test
@@ -27,6 +28,8 @@ import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
+import eu.cdevreeze.yaidom.bridge.DefaultDocawareBridgeElem
+import eu.cdevreeze.yaidom.bridge.DocawareWrapperElem
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.docaware
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
@@ -38,6 +41,8 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
  */
 @RunWith(classOf[JUnitRunner])
 class LinkbaseTest extends Suite {
+
+  import LinkbaseTest._
 
   @Test def testResolve(): Unit = {
     // Test case 202-01
@@ -97,7 +102,7 @@ class LinkbaseTest extends Suite {
       docUris.map(uri => docParser.parse(uri).withUriOption(Some(convertUriToOriginalUri(uri))))
     val resultDocs = docs.map(doc => docaware.Document(doc.uriOption.get, doc))
 
-    Taxonomy.from(resultDocs.map(doc => TaxonomyDoc.fromDocawareElem(doc.documentElement)))
+    createTaxonomy(resultDocs.map(doc => SimpleTaxonomyDoc.fromDocawareElem(doc.documentElement)))
   }
 
   private def convertUriToOriginalUri(uri: URI): URI = {
@@ -132,4 +137,34 @@ class LinkbaseTest extends Suite {
   private val taxoRootDir = new File(classOf[LinkbaseTest].getResource("/taxonomyrootdir").toURI)
 
   private val confSuiteRootDir = new File(classOf[LinkbaseTest].getResource("/XBRL-CONF-CR5-2012-01-24").toURI)
+}
+
+object LinkbaseTest {
+
+  final class SimpleTaxonomyDoc(val docElem: DocawareWrapperElem) extends TaxonomyDoc {
+
+    val xmlFragmentKeysById: Map[String, XmlFragmentKey] = {
+      val result =
+        docElem.filterElemsOrSelf(_.attributeOption(IdEName).isDefined) map { elem =>
+          elem.attribute(IdEName) -> XmlFragmentKey(elem.docUri, elem.path)
+        }
+      result.toMap
+    }
+  }
+
+  object SimpleTaxonomyDoc {
+
+    def fromDocawareElem(elem: docaware.Elem): TaxonomyDoc = {
+      val docElem =
+        new DocawareWrapperElem(
+          new DefaultDocawareBridgeElem(elem))
+      new SimpleTaxonomyDoc(docElem)
+    }
+  }
+
+  def createTaxonomy(docs: immutable.IndexedSeq[TaxonomyDoc]): Taxonomy = {
+    new {
+      val docsByUri: Map[URI, TaxonomyDoc] = docs.groupBy(_.docElem.docUri).mapValues(_.head).toMap
+    } with Taxonomy
+  }
 }

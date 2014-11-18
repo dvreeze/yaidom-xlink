@@ -17,18 +17,16 @@
 package eu.cdevreeze.yaidom.xlink.link
 
 import java.net.URI
-import scala.collection.immutable
 
 /**
  * Taxonomy, containing a Map from document URIs to TaxonomyDoc instances.
  *
  * @author Chris de Vreeze
  */
-final class Taxonomy(val docsByUri: Map[URI, TaxonomyDoc])
+trait Taxonomy {
 
-object Taxonomy {
-
-  def from(docs: immutable.IndexedSeq[TaxonomyDoc]): Taxonomy = {
-    new Taxonomy(docs.groupBy(_.docElem.docUri).mapValues(_.head).toMap)
-  }
+  /**
+   * Map from URIs to documents. This should be a stored value in Taxonomy implementations.
+   */
+  def docsByUri: Map[URI, TaxonomyDoc]
 }
