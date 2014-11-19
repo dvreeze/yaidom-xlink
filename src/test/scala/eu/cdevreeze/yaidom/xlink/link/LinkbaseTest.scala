@@ -16,11 +16,7 @@
 
 package eu.cdevreeze.yaidom.xlink.link
 
-import java.io.File
-import java.net.URI
-
 import scala.Vector
-import scala.collection.immutable
 import scala.reflect.classTag
 
 import org.junit.Test
@@ -29,10 +25,14 @@ import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.bridge.DefaultDocawareBridgeElem
-import eu.cdevreeze.yaidom.bridge.DocawareWrapperElem
 import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.docaware
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.simple
+import eu.cdevreeze.yaidom.xlink.xl
 
 /**
  * Linkbase test case, using data from the XBRL Conformance Suite.
@@ -42,129 +42,102 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 @RunWith(classOf[JUnitRunner])
 class LinkbaseTest extends Suite {
 
-  import LinkbaseTest._
-
-  @Test def testResolve(): Unit = {
-    // Test case 202-01
+  @Test def testReconstructLabelLinkbase(): Unit = {
+    val docParser = DocumentParserUsingDom.newInstance
 
     val pathPrefix = "/XBRL-CONF-CR5-2012-01-24/Common/200-linkbase"
-    val docUris =
-      Vector("202-01-HrefResolution.xsd", "202-01-HrefResolution-label.xml").map(v => classOf[LinkbaseTest].getResource(s"$pathPrefix/$v").toURI)
+    val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/202-01-HrefResolution-label.xml").toURI
 
-    val files = findFiles(taxoRootDir) ++ findFiles(confSuiteRootDir)
+    val doc = docParser.parse(docUri)
+    val bridgeElem = new DefaultDocawareBridgeElem(docaware.Document(docUri, doc).documentElement)
 
-    implicit val taxo = parseTaxonomy(files.map(_.toURI))
+    val linkbase = Linkbase(bridgeElem)
 
-    println(s"Number of taxonomy files: ${taxo.docsByUri.size}")
+    val labelLinks = linkbase.extendedLinksOfType(classTag[LabelLink])
 
-    val linkbase = taxo.docsByUri.filterKeys(_.toString.contains("202-01-HrefResolution-label.xml")).values.head
-    val linkbaseElem = Linkbase(linkbase.docElem)
-
-    val allLinkbasesByUri = taxo.docsByUri flatMap {
-      case (uri, doc) =>
-        if (uri.toString.contains(".xml")) Vector(Linkbase(doc.docElem))
-        else Vector()
+    assertResult(1) {
+      labelLinks.size
     }
 
-    println(s"Number of linkbase files: ${allLinkbasesByUri.size}")
+    val labelLink = labelLinks(0)
 
-    val schema = taxo.docsByUri.filterKeys(_.toString.contains("202-01-HrefResolution.xsd")).values.head
-    val schemaElem = schema.docElem
-
-    val locators = linkbaseElem.findAllElemsOfType(classTag[Locator])
-
-    assertResult(2) {
-      locators.size
-    }
-    assertResult(true) {
-      locators.forall(_.href.toString.contains("202-01-HrefResolution.xsd"))
+    assertResult(6) {
+      labelLink.xlinkChildren.size
     }
 
-    val fragmentKeys = locators.map(loc => loc.resolveHref)
+    val labelArcs = labelLink.labelArcs
+    val locators = labelLink.locatorXLinks
+    val labelResources = labelLink.labelResources
 
-    assertResult(true) {
-      fragmentKeys.forall(key => key.docUri.toString.contains("202-01-HrefResolution.xsd"))
+    assertResult("http://www.xbrl.org/2003/role/link") {
+      labelLink.role
     }
-    assertResult(taxo.docsByUri.keys.filter(u => Set(".xsd", "200-linkbase").forall(s => u.toString.contains(s)))) {
-      fragmentKeys.map(_.docUri).toSet
+    assertResult(Set("http://www.xbrl.org/2003/role/link")) {
+      (labelArcs.map(_.elr) ++ locators.map(_.elr) ++ labelResources.map(_.elr)).toSet
     }
 
-    val elems = fragmentKeys map (key => schemaElem.getElemOrSelfByPath(key.path))
+    import simple.Node._
 
-    assertResult(Set("changeInRetainedEarnings", "fixedAssets")) {
-      elems.flatMap(_.attributeOption(EName("name"))).toSet
+    val scope = linkbase.scope ++ Scope.from("xlink" -> xl.XLink.XLinkNamespace, "link" -> LinkNamespace)
+
+    assertResult(Set("http://www.xbrl.org/2003/linkbase")) {
+      linkbase.findAllElemsOrSelf.flatMap(_.scope.defaultNamespaceOption).toSet
     }
-  }
 
-  private def parseTaxonomy(docUris: Vector[URI]): Taxonomy = {
-    val docParser = DocumentParserUsingDom.newInstance
-    val docs =
-      docUris.map(uri => docParser.parse(uri).withUriOption(Some(convertUriToOriginalUri(uri))))
-    val resultDocs = docs.map(doc => docaware.Document(doc.uriOption.get, doc))
-
-    createTaxonomy(resultDocs.map(doc => SimpleTaxonomyDoc.fromDocawareElem(doc.documentElement)))
-  }
-
-  private def convertUriToOriginalUri(uri: URI): URI = {
-    if (uri.getScheme != "file") uri
-    else {
-      val prefixToStrip =
-        classOf[LinkbaseTest].getResource("/taxonomyrootdir").toURI.getPath.dropWhile(_ == '/')
-      val pathWithoutPrefix =
-        uri.getPath.dropWhile(_ == '/').stripPrefix(prefixToStrip).dropWhile(_ == '/')
-
-      if (pathWithoutPrefix.size == uri.getPath.dropWhile(_ == '/').size) uri
-      else {
-        val (host, path) = pathWithoutPrefix.span(_ != '/')
-
-        val newUri = new URI(s"http://${host}/${path.dropWhile(_ == '/')}")
-        newUri
-      }
+    val locs = locators map { loc =>
+      emptyElem(QName("link:loc"), scope).
+        plusAttribute(QName("xlink:type"), loc.xlinkType.toString).
+        plusAttribute(QName("xlink:href"), loc.href.toString).
+        plusAttribute(QName("xlink:label"), loc.label).
+        plusAttributeOption(QName("xlink:title"), loc.titleOption)
     }
-  }
 
-  private def findFiles(rootDir: File): Vector[File] = {
-    require(rootDir.isDirectory)
-    rootDir.listFiles.toVector flatMap {
-      case f: File if f.isFile => Vector(f)
-      case d: File if d.isDirectory =>
-        // Recursive call
-        findFiles(d)
-      case _ => Vector()
+    val arcs = labelArcs map { arc =>
+      emptyElem(QName("link:labelArc"), scope).
+        plusAttribute(QName("xlink:type"), arc.xlinkType.toString).
+        plusAttribute(QName("xlink:from"), arc.from).
+        plusAttribute(QName("xlink:to"), arc.to).
+        plusAttribute(QName("xlink:arcrole"), arc.arcrole).
+        plusAttributeOption(QName("xlink:show"), arc.showOption).
+        plusAttributeOption(QName("xlink:actuate"), arc.actuateOption).
+        plusAttributeOption(QName("xlink:title"), arc.titleOption)
     }
-  }
 
-  private val taxoRootDir = new File(classOf[LinkbaseTest].getResource("/taxonomyrootdir").toURI)
-
-  private val confSuiteRootDir = new File(classOf[LinkbaseTest].getResource("/XBRL-CONF-CR5-2012-01-24").toURI)
-}
-
-object LinkbaseTest {
-
-  final class SimpleTaxonomyDoc(val docElem: DocawareWrapperElem) extends TaxonomyDoc {
-
-    val xmlFragmentKeysById: Map[String, XmlFragmentKey] = {
-      val result =
-        docElem.filterElemsOrSelf(_.attributeOption(IdEName).isDefined) map { elem =>
-          elem.attribute(IdEName) -> XmlFragmentKey(elem.docUri, elem.path)
-        }
-      result.toMap
+    val labels = labelResources map { label =>
+      textElem(QName("link:label"), scope, label.text).
+        plusAttribute(QName("xlink:type"), label.xlinkType.toString).
+        plusAttribute(QName("xlink:label"), label.label).
+        plusAttributeOption(QName("xlink:role"), label.roleOption).
+        plusAttributeOption(QName("xlink:title"), label.titleOption).
+        plusAttributeOption(QName("xml:lang"), label.attributeOption(EName("http://www.w3.org/XML/1998/namespace", "lang")))
     }
-  }
 
-  object SimpleTaxonomyDoc {
+    val lb =
+      elem(
+        QName("link:linkbase"),
+        scope,
+        Vector(
+          elem(
+            QName("link:labelLink"),
+            Vector(QName("xlink:type") -> labelLink.xlinkType.toString, QName("xlink:role") -> labelLink.role),
+            scope,
+            locs ++ labels ++ arcs)))
 
-    def fromDocawareElem(elem: docaware.Elem): TaxonomyDoc = {
-      val docElem =
-        new DocawareWrapperElem(
-          new DefaultDocawareBridgeElem(elem))
-      new SimpleTaxonomyDoc(docElem)
+    val original = resolved.Elem(linkbase.bridgeElem.toElem).removeAllInterElementWhitespace
+
+    val reconstructed = resolved.Elem(lb).removeAllInterElementWhitespace
+
+    assertResult(original.resolvedName) {
+      reconstructed.resolvedName
     }
-  }
-
-  def createTaxonomy(docs: immutable.IndexedSeq[TaxonomyDoc]): Taxonomy = {
-    new {
-      val docsByUri: Map[URI, TaxonomyDoc] = docs.groupBy(_.docElem.docUri).mapValues(_.head).toMap
-    } with Taxonomy
+    assertResult(original.findAllElemsOrSelf.size) {
+      reconstructed.findAllElemsOrSelf.size
+    }
+    assertResult(original.findAllChildElems.map(e => e.withChildren(Vector())).toSet) {
+      reconstructed.findAllChildElems.map(e => e.withChildren(Vector())).toSet
+    }
+    assertResult(original.findAllChildElems.flatMap(_.findAllElems).toSet) {
+      reconstructed.findAllChildElems.flatMap(_.findAllElems).toSet
+    }
   }
 }

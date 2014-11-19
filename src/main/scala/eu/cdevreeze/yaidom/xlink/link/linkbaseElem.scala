@@ -21,6 +21,7 @@ import java.net.URI
 import scala.BigDecimal
 import scala.collection.immutable
 import scala.reflect.classTag
+import scala.reflect.ClassTag
 
 import eu.cdevreeze.yaidom.bridge.DocawareBridgeElem
 import eu.cdevreeze.yaidom.core.EName
@@ -92,6 +93,9 @@ final class Linkbase private[link] (
 
   final def extendedLinks: immutable.IndexedSeq[ExtendedLink] =
     findAllChildElemsOfType(classTag[ExtendedLink])
+
+  final def extendedLinksOfType[B <: ExtendedLink](subType: ClassTag[B]): immutable.IndexedSeq[B] =
+    findAllChildElemsOfType(subType)
 
   // Can have documentation, roleRef, arcroleRef and any extended link children
 }
@@ -190,7 +194,11 @@ final class LabelLink private[link] (
 
   require(resolvedName == LinkLabelLinkEName)
 
-  // Can have title, documentation, loc, labelArc and label children
+  final def labelArcs: immutable.IndexedSeq[LabelArc] =
+    findAllChildElemsOfType(classTag[LabelArc])
+
+  final def labelResources: immutable.IndexedSeq[LabelResource] =
+    findAllChildElemsOfType(classTag[LabelResource])
 }
 
 final class ReferenceLink private[link] (
@@ -199,7 +207,11 @@ final class ReferenceLink private[link] (
 
   require(resolvedName == LinkReferenceLinkEName)
 
-  // Can have title, documentation, loc, referenceArc and reference children
+  final def referenceArcs: immutable.IndexedSeq[ReferenceArc] =
+    findAllChildElemsOfType(classTag[ReferenceArc])
+
+  final def referenceResources: immutable.IndexedSeq[ReferenceResource] =
+    findAllChildElemsOfType(classTag[ReferenceResource])
 }
 
 final class CalculationLink private[link] (
@@ -208,7 +220,8 @@ final class CalculationLink private[link] (
 
   require(resolvedName == LinkCalculationLinkEName)
 
-  // Can have title, documentation, loc and calculationArc children
+  final def calculationArcs: immutable.IndexedSeq[CalculationArc] =
+    findAllChildElemsOfType(classTag[CalculationArc])
 }
 
 final class PresentationLink private[link] (
@@ -217,7 +230,8 @@ final class PresentationLink private[link] (
 
   require(resolvedName == LinkPresentationLinkEName)
 
-  // Can have title, documentation, loc and presentationArc children
+  final def presentationArcs: immutable.IndexedSeq[PresentationArc] =
+    findAllChildElemsOfType(classTag[PresentationArc])
 }
 
 final class DefinitionLink private[link] (
@@ -226,7 +240,8 @@ final class DefinitionLink private[link] (
 
   require(resolvedName == LinkDefinitionLinkEName)
 
-  // Can have title, documentation, loc and definitionArc children
+  final def definitionArcs: immutable.IndexedSeq[DefinitionArc] =
+    findAllChildElemsOfType(classTag[DefinitionArc])
 }
 
 final class FootnoteLink private[link] (
@@ -235,7 +250,11 @@ final class FootnoteLink private[link] (
 
   require(resolvedName == LinkFootnoteLinkEName)
 
-  // Can have title, documentation, loc, footnoteArc and footnote children
+  final def footnoteArcs: immutable.IndexedSeq[FootnoteArc] =
+    findAllChildElemsOfType(classTag[FootnoteArc])
+
+  final def footnoteResources: immutable.IndexedSeq[FootnoteResource] =
+    findAllChildElemsOfType(classTag[FootnoteResource])
 }
 
 // Arcs
@@ -362,32 +381,6 @@ abstract class Locator private[link] (
 
   final def titleXLinks: immutable.IndexedSeq[Title] =
     findAllChildElemsOfType(classTag[Title])
-
-  /**
-   * Resolves the href of this locator against the given "taxonomy". If the href cannot be resolved, an
-   * exception is thrown.
-   *
-   * This method may be too slow to use in bulk.
-   */
-  final def resolveHref(implicit taxonomy: Taxonomy): XmlFragmentKey = {
-    val baseUri = bridgeElem.baseUri
-    val absoluteUri = baseUri.resolve(href)
-    require(absoluteUri.isAbsolute, s"Href $href does not resolve to an absolute URI")
-
-    val absoluteUriWithoutFragment = new URI(absoluteUri.getScheme, absoluteUri.getSchemeSpecificPart, null)
-    val fragment = absoluteUri.getFragment
-
-    val taxoDoc =
-      taxonomy.docsByUri.getOrElse(absoluteUriWithoutFragment, sys.error(s"Href $href (ignoring the optional fragment) could not be resolved"))
-
-    if (fragment == null) XmlFragmentKey(taxoDoc.docElem.docUri, taxoDoc.docElem.path)
-    else {
-      // TODO XPointer
-      val xmlFragmentKey =
-        taxoDoc.xmlFragmentKeysById.getOrElse(fragment, sys.error(s"The fragment in href $href could not be resolved"))
-      xmlFragmentKey
-    }
-  }
 }
 
 final class StandardLocator private[link] (
