@@ -2,7 +2,7 @@
 Yaidom-xlink
 ============
 
-Yaidom-based XLink support. This library offers thin XLink wrappers around yaidom Elems that correspond to XLink content.
+Yaidom-based XLink and linkbase support.
 
 Usage
 =====
