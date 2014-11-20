@@ -354,4 +354,38 @@ class LinkbaseTest extends Suite {
       calculationLinks.flatMap(_.arcs).map(e => BigDecimal(e.attribute(EName("weight")))).toSet
     }
   }
+
+  @Test def testGenericLink(): Unit = {
+    val docParser = DocumentParserUsingDom.newInstance
+
+    val docUri = classOf[LinkbaseTest].getResource("/sample-generic-linkbase.xml").toURI
+
+    val doc = docParser.parse(docUri)
+    val bridgeElem = new DefaultDocawareBridgeElem(docaware.Document(docUri, doc).documentElement)
+
+    val linkbase = Linkbase(bridgeElem)
+
+    val extendedLinks = linkbase.extendedLinks
+    val genericLinks = linkbase.genericLinks
+
+    assertResult(1) {
+      extendedLinks.size
+    }
+    assertResult(extendedLinks) {
+      genericLinks
+    }
+
+    assertResult(Set("opinion")) {
+      genericLinks.head.resources.map(_.localName).toSet
+    }
+    assertResult(Set("arc")) {
+      genericLinks.head.arcs.map(_.localName).toSet
+    }
+    assertResult(genericLinks.head.arcs) {
+      genericLinks.head.findAllChildElemsOfType(classTag[GenericArc])
+    }
+    assertResult(List("loc", "loc", "loc")) {
+      genericLinks.head.locators.map(_.localName)
+    }
+  }
 }
