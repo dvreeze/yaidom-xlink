@@ -67,7 +67,7 @@ trait ExtendedLink extends Link {
    *
    * That is, returns:
    * {{{
-   * resourceXLinks groupBy (_.label)
+   * resources groupBy (_.label)
    * }}}
    */
   def labeledResources: Map[String, immutable.IndexedSeq[Resource]]
@@ -77,7 +77,7 @@ trait ExtendedLink extends Link {
    *
    * That is, returns:
    * {{{
-   * locatorXLinks groupBy (_.label)
+   * locators groupBy (_.label)
    * }}}
    */
   def labeledLocators: Map[String, immutable.IndexedSeq[Locator]]
@@ -87,7 +87,7 @@ trait ExtendedLink extends Link {
    *
    * That is, returns:
    * {{{
-   * (resourceXLinks ++ locatorXLinks) groupBy (_.label)
+   * (resources ++ locators) groupBy (_.label)
    * }}}
    */
   def labeledXLinks: Map[String, immutable.IndexedSeq[LabeledXLink]]
@@ -97,10 +97,10 @@ trait ExtendedLink extends Link {
 
   // There can also be Documentation children, but these are not XLinks themselves
 
-  def titleXLinks: immutable.IndexedSeq[Title]
-  def locatorXLinks: immutable.IndexedSeq[Locator]
-  def arcXLinks: immutable.IndexedSeq[Arc]
-  def resourceXLinks: immutable.IndexedSeq[Resource]
+  def titleElems: immutable.IndexedSeq[Title]
+  def locators: immutable.IndexedSeq[Locator]
+  def arcs: immutable.IndexedSeq[Arc]
+  def resources: immutable.IndexedSeq[Resource]
 }
 
 /** Arc */
@@ -116,7 +116,7 @@ trait Arc extends XLink {
   def showOption: Option[String]
   def actuateOption: Option[String]
 
-  def titleXLinks: immutable.IndexedSeq[Title]
+  def titleElems: immutable.IndexedSeq[Title]
 
   def orderOption: Option[BigDecimal]
   def useOption: Option[XLink.Use]
@@ -139,7 +139,7 @@ trait Locator extends LabeledXLink {
   def roleOption: Option[String]
   def titleOption: Option[String]
 
-  def titleXLinks: immutable.IndexedSeq[Title]
+  def titleElems: immutable.IndexedSeq[Title]
 }
 
 /** Resource */

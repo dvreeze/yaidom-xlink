@@ -166,15 +166,15 @@ abstract class ExtendedLink private[link] (
     findAllChildElemsOfType(classTag[XLink])
 
   final val labeledResources: Map[String, immutable.IndexedSeq[Resource]] = {
-    resourceXLinks.groupBy(_.label)
+    resources.groupBy(_.label)
   }
 
   final val labeledLocators: Map[String, immutable.IndexedSeq[Locator]] = {
-    locatorXLinks.groupBy(_.label)
+    locators.groupBy(_.label)
   }
 
   final val labeledXLinks: Map[String, immutable.IndexedSeq[XLink with xl.LabeledXLink]] = {
-    (resourceXLinks ++ locatorXLinks).groupBy(_.label)
+    (resources ++ locators).groupBy(_.label)
   }
 
   final val baseUri: URI = bridgeElem.baseUri
@@ -183,16 +183,16 @@ abstract class ExtendedLink private[link] (
 
   final def titleOption: Option[String] = attributeOption(xl.XLink.XLinkTitleEName)
 
-  final def titleXLinks: immutable.IndexedSeq[Title] =
+  final def titleElems: immutable.IndexedSeq[Title] =
     findAllChildElemsOfType(classTag[Title])
 
-  final def locatorXLinks: immutable.IndexedSeq[Locator] =
+  final def locators: immutable.IndexedSeq[Locator] =
     findAllChildElemsOfType(classTag[Locator])
 
-  final def arcXLinks: immutable.IndexedSeq[Arc] =
+  final def arcs: immutable.IndexedSeq[Arc] =
     findAllChildElemsOfType(classTag[Arc])
 
-  final def resourceXLinks: immutable.IndexedSeq[Resource] =
+  final def resources: immutable.IndexedSeq[Resource] =
     findAllChildElemsOfType(classTag[Resource])
 }
 
@@ -303,7 +303,7 @@ abstract class Arc private[link] (
 
   final def actuateOption: Option[String] = attributeOption(xl.XLink.XLinkActuateEName)
 
-  final def titleXLinks: immutable.IndexedSeq[Title] =
+  final def titleElems: immutable.IndexedSeq[Title] =
     findAllChildElemsOfType(classTag[Title])
 
   final def orderOption: Option[BigDecimal] =
@@ -397,7 +397,7 @@ abstract class Locator private[link] (
 
   final def titleOption: Option[String] = attributeOption(xl.XLink.XLinkTitleEName)
 
-  final def titleXLinks: immutable.IndexedSeq[Title] =
+  final def titleElems: immutable.IndexedSeq[Title] =
     findAllChildElemsOfType(classTag[Title])
 }
 

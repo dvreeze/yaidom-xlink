@@ -66,7 +66,7 @@ class LinkbaseTest extends Suite {
     }
 
     val labelArcs = labelLink.labelArcs
-    val locators = labelLink.locatorXLinks
+    val locators = labelLink.locators
     val labelResources = labelLink.labelResources
 
     assertResult("http://www.xbrl.org/2003/role/link") {
@@ -165,7 +165,7 @@ class LinkbaseTest extends Suite {
     }
 
     val referenceArcs = referenceLink.referenceArcs
-    val locators = referenceLink.locatorXLinks
+    val locators = referenceLink.locators
     val referenceResources = referenceLink.referenceResources
 
     assertResult("http://www.xbrl.org/2003/role/link") {
@@ -273,10 +273,10 @@ class LinkbaseTest extends Suite {
       definitionLinks.forall(_.role == "http://www.xbrl.org/2003/role/link")
     }
     assertResult(true) {
-      definitionLinks.flatMap(_.locatorXLinks).forall(_.elr == "http://www.xbrl.org/2003/role/link")
+      definitionLinks.flatMap(_.locators).forall(_.elr == "http://www.xbrl.org/2003/role/link")
     }
     assertResult(true) {
-      definitionLinks.flatMap(_.arcXLinks).forall(_.elr == "http://www.xbrl.org/2003/role/link")
+      definitionLinks.flatMap(_.arcs).forall(_.elr == "http://www.xbrl.org/2003/role/link")
     }
 
     assertResult(true) {
@@ -287,7 +287,7 @@ class LinkbaseTest extends Suite {
     }
 
     assertResult(Set("http://mycompany.com/xbrl/decArcCyclesUD/undirected")) {
-      definitionLinks.flatMap(_.arcXLinks).map(_.arcrole).toSet
+      definitionLinks.flatMap(_.arcs).map(_.arcrole).toSet
     }
   }
 
@@ -313,11 +313,11 @@ class LinkbaseTest extends Suite {
     }
 
     assertResult(linkbase.findAllChildElemsOfType(classTag[ArcroleRef]).map(_.arcroleUri).toSet) {
-      presentationLinks.flatMap(_.arcXLinks).map(_.arcrole).toSet
+      presentationLinks.flatMap(_.arcs).map(_.arcrole).toSet
     }
 
     assertResult(true) {
-      presentationLinks.forall(lnk => (lnk.arcXLinks.flatMap(arc => Vector(arc.from, arc.to))).toSet == lnk.locatorXLinks.map(_.label).toSet)
+      presentationLinks.forall(lnk => (lnk.arcs.flatMap(arc => Vector(arc.from, arc.to))).toSet == lnk.locators.map(_.label).toSet)
     }
   }
 
@@ -343,15 +343,15 @@ class LinkbaseTest extends Suite {
     }
 
     assertResult(Set("http://www.xbrl.org/2003/arcrole/summation-item")) {
-      calculationLinks.flatMap(_.arcXLinks).map(_.arcrole).toSet
+      calculationLinks.flatMap(_.arcs).map(_.arcrole).toSet
     }
 
     assertResult(true) {
-      calculationLinks.forall(lnk => (lnk.arcXLinks.flatMap(arc => Vector(arc.from, arc.to))).toSet == lnk.locatorXLinks.map(_.label).toSet)
+      calculationLinks.forall(lnk => (lnk.arcs.flatMap(arc => Vector(arc.from, arc.to))).toSet == lnk.locators.map(_.label).toSet)
     }
 
     assertResult(Set(BigDecimal("0.4"), BigDecimal("0.6"), BigDecimal("1"))) {
-      calculationLinks.flatMap(_.arcXLinks).map(e => BigDecimal(e.attribute(EName("weight")))).toSet
+      calculationLinks.flatMap(_.arcs).map(e => BigDecimal(e.attribute(EName("weight")))).toSet
     }
   }
 }
