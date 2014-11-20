@@ -53,7 +53,7 @@ class LinkbaseTest extends Suite {
 
     val linkbase = Linkbase(bridgeElem)
 
-    val labelLinks = linkbase.extendedLinksOfType(classTag[LabelLink])
+    val labelLinks = linkbase.labelLinks
 
     assertResult(1) {
       labelLinks.size
@@ -109,7 +109,7 @@ class LinkbaseTest extends Suite {
         plusAttribute(QName("xlink:label"), label.label).
         plusAttributeOption(QName("xlink:role"), label.roleOption).
         plusAttributeOption(QName("xlink:title"), label.titleOption).
-        plusAttributeOption(QName("xml:lang"), label.attributeOption(EName("http://www.w3.org/XML/1998/namespace", "lang")))
+        plusAttributeOption(QName("xml:lang"), label.langOption)
     }
 
     val lb =
@@ -138,6 +138,220 @@ class LinkbaseTest extends Suite {
     }
     assertResult(original.findAllChildElems.flatMap(_.findAllElems).toSet) {
       reconstructed.findAllChildElems.flatMap(_.findAllElems).toSet
+    }
+  }
+
+  @Test def testReconstructReferenceLinkbase(): Unit = {
+    val docParser = DocumentParserUsingDom.newInstance
+
+    val pathPrefix = "/XBRL-CONF-CR5-2012-01-24/Common/200-linkbase"
+    val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/291-11-ArcOverrideReferenceLinkbases-2-reference.xml").toURI
+
+    val doc = docParser.parse(docUri)
+    val bridgeElem = new DefaultDocawareBridgeElem(docaware.Document(docUri, doc).documentElement)
+
+    val linkbase = Linkbase(bridgeElem)
+
+    val referenceLinks = linkbase.referenceLinks
+
+    assertResult(1) {
+      referenceLinks.size
+    }
+
+    val referenceLink = referenceLinks(0)
+
+    assertResult(5) {
+      referenceLink.xlinkChildren.size
+    }
+
+    val referenceArcs = referenceLink.referenceArcs
+    val locators = referenceLink.locatorXLinks
+    val referenceResources = referenceLink.referenceResources
+
+    assertResult("http://www.xbrl.org/2003/role/link") {
+      referenceLink.role
+    }
+    assertResult(Set("http://www.xbrl.org/2003/role/link")) {
+      (referenceArcs.map(_.elr) ++ locators.map(_.elr) ++ referenceResources.map(_.elr)).toSet
+    }
+
+    import simple.Node._
+
+    val scope = linkbase.scope ++ Scope.from(
+      "xlink" -> xl.XLink.XLinkNamespace,
+      "link" -> LinkNamespace,
+      "ref" -> "http://mycompany.com/xbrl/taxonomy")
+
+    assertResult(Set("http://www.xbrl.org/2003/linkbase")) {
+      linkbase.findAllElemsOrSelf.flatMap(_.scope.defaultNamespaceOption).toSet
+    }
+
+    val locs = locators map { loc =>
+      emptyElem(QName("link:loc"), scope).
+        plusAttribute(QName("xlink:type"), loc.xlinkType.toString).
+        plusAttribute(QName("xlink:href"), loc.href.toString).
+        plusAttribute(QName("xlink:label"), loc.label).
+        plusAttributeOption(QName("xlink:title"), loc.titleOption)
+    }
+
+    val arcs = referenceArcs map { arc =>
+      emptyElem(QName("link:referenceArc"), scope).
+        plusAttribute(QName("xlink:type"), arc.xlinkType.toString).
+        plusAttribute(QName("xlink:from"), arc.from).
+        plusAttribute(QName("xlink:to"), arc.to).
+        plusAttribute(QName("xlink:arcrole"), arc.arcrole).
+        plusAttributeOption(QName("xlink:show"), arc.showOption).
+        plusAttributeOption(QName("xlink:actuate"), arc.actuateOption).
+        plusAttributeOption(QName("xlink:title"), arc.titleOption).
+        plusAttributeOption(QName("use"), arc.attributeOption(UseEName)).
+        plusAttributeOption(QName("priority"), arc.attributeOption(PriorityEName))
+    }
+
+    val references = referenceResources map { ref =>
+      emptyElem(QName("link:reference"), scope).
+        plusAttribute(QName("xlink:type"), ref.xlinkType.toString).
+        plusAttribute(QName("xlink:label"), ref.label).
+        plusAttributeOption(QName("xlink:role"), ref.roleOption).
+        withChildren(ref.findAllChildElems.map(_.bridgeElem.toElem))
+    }
+
+    val lb =
+      elem(
+        QName("link:linkbase"),
+        scope,
+        Vector(
+          elem(
+            QName("link:referenceLink"),
+            Vector(QName("xlink:type") -> referenceLink.xlinkType.toString, QName("xlink:role") -> referenceLink.role),
+            scope,
+            locs ++ references ++ arcs)))
+
+    val original = resolved.Elem(linkbase.bridgeElem.toElem).removeAllInterElementWhitespace
+
+    val reconstructed = resolved.Elem(lb).removeAllInterElementWhitespace
+
+    assertResult(original.resolvedName) {
+      reconstructed.resolvedName
+    }
+    assertResult(original.findAllElemsOrSelf.size) {
+      reconstructed.findAllElemsOrSelf.size
+    }
+    assertResult(original.findAllChildElems.map(e => e.withChildren(Vector())).toSet) {
+      reconstructed.findAllChildElems.map(e => e.withChildren(Vector())).toSet
+    }
+    assertResult(original.findAllChildElems.flatMap(_.findAllElems).toSet) {
+      reconstructed.findAllChildElems.flatMap(_.findAllElems).toSet
+    }
+  }
+
+  @Test def testMultipleDefinitionLinks(): Unit = {
+    val docParser = DocumentParserUsingDom.newInstance
+
+    val pathPrefix = "/XBRL-CONF-CR5-2012-01-24/Common/200-linkbase"
+    val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/DecArcCyclesUD_definition.xml").toURI
+
+    val doc = docParser.parse(docUri)
+    val bridgeElem = new DefaultDocawareBridgeElem(docaware.Document(docUri, doc).documentElement)
+
+    val linkbase = Linkbase(bridgeElem)
+
+    val extendedLinks = linkbase.extendedLinks
+
+    val definitionLinks = linkbase.definitionLinks
+
+    assertResult(12) {
+      extendedLinks.size
+    }
+    assertResult(12) {
+      definitionLinks.size
+    }
+    assertResult(extendedLinks) {
+      definitionLinks
+    }
+
+    assertResult(true) {
+      definitionLinks.forall(_.role == "http://www.xbrl.org/2003/role/link")
+    }
+    assertResult(true) {
+      definitionLinks.flatMap(_.locatorXLinks).forall(_.elr == "http://www.xbrl.org/2003/role/link")
+    }
+    assertResult(true) {
+      definitionLinks.flatMap(_.arcXLinks).forall(_.elr == "http://www.xbrl.org/2003/role/link")
+    }
+
+    assertResult(true) {
+      definitionLinks.map(_.labeledResources).flatMap(_.keySet).isEmpty
+    }
+    assertResult(true) {
+      Set("conceptA", "conceptB", "conceptH").subsetOf(definitionLinks.map(_.labeledLocators).flatMap(_.keySet).toSet)
+    }
+
+    assertResult(Set("http://mycompany.com/xbrl/decArcCyclesUD/undirected")) {
+      definitionLinks.flatMap(_.arcXLinks).map(_.arcrole).toSet
+    }
+  }
+
+  @Test def testMultiplePresentationLinks(): Unit = {
+    val docParser = DocumentParserUsingDom.newInstance
+
+    val pathPrefix = "/XBRL-CONF-CR5-2012-01-24/Common/200-linkbase"
+    val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/ArcRoleDR_presentation.xml").toURI
+
+    val doc = docParser.parse(docUri)
+    val bridgeElem = new DefaultDocawareBridgeElem(docaware.Document(docUri, doc).documentElement)
+
+    val linkbase = Linkbase(bridgeElem)
+
+    assertResult(2) {
+      linkbase.findAllChildElemsOfType(classTag[ArcroleRef]).size
+    }
+
+    def presentationLinks = linkbase.presentationLinks
+
+    assertResult(2) {
+      presentationLinks.size
+    }
+
+    assertResult(linkbase.findAllChildElemsOfType(classTag[ArcroleRef]).map(_.arcroleUri).toSet) {
+      presentationLinks.flatMap(_.arcXLinks).map(_.arcrole).toSet
+    }
+
+    assertResult(true) {
+      presentationLinks.forall(lnk => (lnk.arcXLinks.flatMap(arc => Vector(arc.from, arc.to))).toSet == lnk.locatorXLinks.map(_.label).toSet)
+    }
+  }
+
+  @Test def testMultipleCalculationLinks(): Unit = {
+    val docParser = DocumentParserUsingDom.newInstance
+
+    val pathPrefix = "/XBRL-CONF-CR5-2012-01-24/Common/200-linkbase"
+    val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/ArcCyclesSIUC_calculation.xml").toURI
+
+    val doc = docParser.parse(docUri)
+    val bridgeElem = new DefaultDocawareBridgeElem(docaware.Document(docUri, doc).documentElement)
+
+    val linkbase = Linkbase(bridgeElem)
+
+    assertResult(0) {
+      linkbase.findAllChildElemsOfType(classTag[ArcroleRef]).size
+    }
+
+    def calculationLinks = linkbase.calculationLinks
+
+    assertResult(11) {
+      calculationLinks.size
+    }
+
+    assertResult(Set("http://www.xbrl.org/2003/arcrole/summation-item")) {
+      calculationLinks.flatMap(_.arcXLinks).map(_.arcrole).toSet
+    }
+
+    assertResult(true) {
+      calculationLinks.forall(lnk => (lnk.arcXLinks.flatMap(arc => Vector(arc.from, arc.to))).toSet == lnk.locatorXLinks.map(_.label).toSet)
+    }
+
+    assertResult(Set(BigDecimal("0.4"), BigDecimal("0.6"), BigDecimal("1"))) {
+      calculationLinks.flatMap(_.arcXLinks).map(e => BigDecimal(e.attribute(EName("weight")))).toSet
     }
   }
 }

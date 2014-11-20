@@ -40,6 +40,7 @@ package object link {
   val GenNamespace = URI.create("http://xbrl.org/2008/generic").toString
   val LabelNamespace = URI.create("http://xbrl.org/2008/label").toString
   val ReferenceNamespace = URI.create("http://xbrl.org/2008/reference").toString
+  val XmlNamespace = URI.create("http://www.w3.org/XML/1998/namespace").toString
 
   val LinkLinkbaseEName = EName(LinkNamespace, "linkbase")
 
@@ -82,9 +83,15 @@ package object link {
   val LabelLabelEName = EName(LabelNamespace, "label")
   val ReferenceReferenceEName = EName(ReferenceNamespace, "reference")
 
+  val XmlLangEName = EName(XmlNamespace, "lang")
+  val XmlBaseEName = EName(XmlNamespace, "base")
+
   val OrderEName = EName("order")
   val UseEName = EName("use")
   val PriorityEName = EName("priority")
+
+  val RoleUriEName = EName("roleURI")
+  val ArcroleUriEName = EName("arcroleURI")
 
   val IdEName = EName("id")
 }

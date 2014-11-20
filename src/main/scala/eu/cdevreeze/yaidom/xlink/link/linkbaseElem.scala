@@ -98,6 +98,24 @@ final class Linkbase private[link] (
     findAllChildElemsOfType(subType)
 
   // Can have documentation, roleRef, arcroleRef and any extended link children
+
+  final def calculationLinks: immutable.IndexedSeq[CalculationLink] =
+    findAllChildElemsOfType(classTag[CalculationLink])
+
+  final def definitionLinks: immutable.IndexedSeq[DefinitionLink] =
+    findAllChildElemsOfType(classTag[DefinitionLink])
+
+  final def presentationLinks: immutable.IndexedSeq[PresentationLink] =
+    findAllChildElemsOfType(classTag[PresentationLink])
+
+  final def labelLinks: immutable.IndexedSeq[LabelLink] =
+    findAllChildElemsOfType(classTag[LabelLink])
+
+  final def referenceLinks: immutable.IndexedSeq[ReferenceLink] =
+    findAllChildElemsOfType(classTag[ReferenceLink])
+
+  final def genericLinks: immutable.IndexedSeq[GenericLink] =
+    findAllChildElemsOfType(classTag[GenericLink])
 }
 
 // XLink
@@ -428,6 +446,8 @@ final class LabelResource private[link] (
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardResource(bridgeElem, childElems) {
 
   require(resolvedName == LinkLabelEName)
+
+  def langOption: Option[String] = bridgeElem.backingElem.attributeOption(XmlLangEName)
 }
 
 final class ReferenceResource private[link] (
@@ -499,6 +519,8 @@ final class RoleRef private[link] (
   require(resolvedName == LinkRoleRefEName)
 
   // Must have roleURI attribute
+
+  def arcroleUri: String = attribute(RoleUriEName)
 }
 
 final class ArcroleRef private[link] (
@@ -508,6 +530,8 @@ final class ArcroleRef private[link] (
   require(resolvedName == LinkArcroleRefEName)
 
   // Must have arcroleURI attribute
+
+  def arcroleUri: String = attribute(ArcroleUriEName)
 }
 
 final class Definition private[link] (
@@ -580,7 +604,7 @@ object LinkbaseElem {
       case LinkReferenceLinkEName => new ReferenceLink(elem, childElems)
       case LinkCalculationLinkEName => new CalculationLink(elem, childElems)
       case LinkPresentationLinkEName => new PresentationLink(elem, childElems)
-      case LinkDefinitionEName => new DefinitionLink(elem, childElems)
+      case LinkDefinitionLinkEName => new DefinitionLink(elem, childElems)
       case LinkFootnoteLinkEName => new FootnoteLink(elem, childElems)
       case _ => new GenericLink(elem, childElems)
     }
@@ -633,5 +657,10 @@ object Linkbase {
   /** Creates a Linkbase. This method is rather expensive. */
   def apply(elem: DocawareBridgeElem): Linkbase = {
     new Linkbase(elem, elem.findAllChildElems.map(e => LinkbaseElem(e)))
+  }
+
+  /** Returns true if the element must be a linkbase (looking at the element resolved name) */
+  def accepts(elem: DocawareBridgeElem): Boolean = {
+    elem.resolvedName == LinkLinkbaseEName
   }
 }
