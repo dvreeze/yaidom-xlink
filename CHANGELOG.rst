@@ -3,6 +3,17 @@ CHANGELOG
 =========
 
 
+1.3
+===
+
+This version depends on yaidom 1.3.
+
+Moreover, support has been added for so-called "bridge elements" (useful in several projects that model an XML dialect),
+and XBRL linkbases have been modeled (and XLink as restricted by XBRL has been modeled as well).
+
+In time, the old xlink package content will be phased out.
+
+
 1.2
 ===
 
