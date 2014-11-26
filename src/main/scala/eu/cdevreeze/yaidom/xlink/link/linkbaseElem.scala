@@ -73,7 +73,7 @@ sealed abstract class LinkbaseElem private[link] (
   final def text: String = bridgeElem.text
 
   final def findChildElemByPathEntry(entry: Path.Entry): Option[LinkbaseElem] =
-    childElems.find(e => e.localName == entry.elementName.localPart && e.bridgeElem.path.lastEntry == entry)
+    childElems.toStream.filter(_.resolvedName == entry.elementName).drop(entry.index).headOption
 
   final override def equals(other: Any): Boolean = other match {
     case e: LinkbaseElem => bridgeElem.backingElem == e.bridgeElem.backingElem
@@ -289,7 +289,7 @@ abstract class Arc private[link] (
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeArc
 
   final def elr: String =
-    getElemOrSelfByPath(bridgeElem.path.parentPath).attribute(xl.XLink.XLinkRoleEName)
+    bridgeElem.rootElem.getElemOrSelfByPath(bridgeElem.path.parentPath).attribute(xl.XLink.XLinkRoleEName)
 
   final def from: String = attribute(xl.XLink.XLinkFromEName)
 
@@ -387,7 +387,7 @@ abstract class Locator private[link] (
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeLocator
 
   final def elr: String =
-    getElemOrSelfByPath(bridgeElem.path.parentPath).attribute(xl.XLink.XLinkRoleEName)
+    bridgeElem.rootElem.getElemOrSelfByPath(bridgeElem.path.parentPath).attribute(xl.XLink.XLinkRoleEName)
 
   final def label: String = attribute(xl.XLink.XLinkLabelEName)
 
@@ -422,7 +422,7 @@ abstract class Resource private[link] (
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeResource
 
   final def elr: String =
-    getElemOrSelfByPath(bridgeElem.path.parentPath).attribute(xl.XLink.XLinkRoleEName)
+    bridgeElem.rootElem.getElemOrSelfByPath(bridgeElem.path.parentPath).attribute(xl.XLink.XLinkRoleEName)
 
   final def label: String = attribute(xl.XLink.XLinkLabelEName)
 
@@ -447,8 +447,7 @@ final class LabelResource private[link] (
 
   require(resolvedName == LinkLabelEName)
 
-  def langOption: Option[String] =
-    bridgeElem.resolvedAttributes.filter(_._1 == XmlLangEName).map(_._2).headOption
+  def langOption: Option[String] = bridgeElem.backingElem.attributeOption(XmlLangEName)
 }
 
 final class ReferenceResource private[link] (
@@ -579,7 +578,7 @@ object LinkbaseElem {
   }
 
   private[link] def apply(elem: DocawareBridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): LinkbaseElem = {
-    elem.resolvedAttributes.filter(_._1 == xl.XLink.XLinkTypeEName).map(_._2).headOption match {
+    elem.backingElem.attributeOption(xl.XLink.XLinkTypeEName) match {
       case Some("extended") => applyForExtendedLink(elem, childElems)
       case Some("simple") => applyForSimpleLink(elem, childElems)
       case Some("arc") => applyForArc(elem, childElems)
