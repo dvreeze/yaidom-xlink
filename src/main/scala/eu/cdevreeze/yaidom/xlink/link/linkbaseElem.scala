@@ -563,7 +563,7 @@ final class ArcroleType private[link] (
 
   require(resolvedName == LinkArcroleTypeEName)
 
-  // Has at most one definition and at least one unsedOn. Has arcroleURI and cyclesAllowed attributes.
+  // Has at most one definition and at least one usedOn. Has arcroleURI and cyclesAllowed attributes.
 }
 
 // Factories.
