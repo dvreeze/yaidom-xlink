@@ -289,7 +289,7 @@ abstract class Arc private[link] (
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeArc
 
   final def elr: String =
-    bridgeElem.rootElem.getElemOrSelfByPath(bridgeElem.path.parentPath).attribute(xl.XLink.XLinkRoleEName)
+    getElemOrSelfByPath(bridgeElem.path.parentPath).attribute(xl.XLink.XLinkRoleEName)
 
   final def from: String = attribute(xl.XLink.XLinkFromEName)
 
@@ -387,7 +387,7 @@ abstract class Locator private[link] (
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeLocator
 
   final def elr: String =
-    bridgeElem.rootElem.getElemOrSelfByPath(bridgeElem.path.parentPath).attribute(xl.XLink.XLinkRoleEName)
+    getElemOrSelfByPath(bridgeElem.path.parentPath).attribute(xl.XLink.XLinkRoleEName)
 
   final def label: String = attribute(xl.XLink.XLinkLabelEName)
 
@@ -422,7 +422,7 @@ abstract class Resource private[link] (
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeResource
 
   final def elr: String =
-    bridgeElem.rootElem.getElemOrSelfByPath(bridgeElem.path.parentPath).attribute(xl.XLink.XLinkRoleEName)
+    getElemOrSelfByPath(bridgeElem.path.parentPath).attribute(xl.XLink.XLinkRoleEName)
 
   final def label: String = attribute(xl.XLink.XLinkLabelEName)
 
@@ -447,7 +447,8 @@ final class LabelResource private[link] (
 
   require(resolvedName == LinkLabelEName)
 
-  def langOption: Option[String] = bridgeElem.backingElem.attributeOption(XmlLangEName)
+  def langOption: Option[String] =
+    bridgeElem.resolvedAttributes.filter(_._1 == XmlLangEName).map(_._2).headOption
 }
 
 final class ReferenceResource private[link] (
@@ -578,7 +579,7 @@ object LinkbaseElem {
   }
 
   private[link] def apply(elem: DocawareBridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): LinkbaseElem = {
-    elem.backingElem.attributeOption(xl.XLink.XLinkTypeEName) match {
+    elem.resolvedAttributes.filter(_._1 == xl.XLink.XLinkTypeEName).map(_._2).headOption match {
       case Some("extended") => applyForExtendedLink(elem, childElems)
       case Some("simple") => applyForSimpleLink(elem, childElems)
       case Some("arc") => applyForArc(elem, childElems)

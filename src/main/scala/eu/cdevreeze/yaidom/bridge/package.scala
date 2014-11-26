@@ -33,7 +33,7 @@ package eu.cdevreeze.yaidom
  * ==Design notes==
  *
  * Why do we need all this wrapping? After all, a simple element is wrapped in a more general `DefaultSimpleBridgeElem`
- * (probably without any object creation costs), which is wrapped in a `SimpleWrapperElem` if you need the yaidom
+ * (possibly without any object creation costs), which is wrapped in a `SimpleWrapperElem` if you need the yaidom
  * query API on the "bridge element".
  *
  * Had the yaidom query API traits been implemented using abstract types instead of type parameters, we would not have

@@ -43,9 +43,9 @@ trait IndexedBridgeElem extends Any with SimpleBridgeElem {
   override type SelfType <: IndexedBridgeElem
 
   /**
-   * The unwrapped backing element type, for example `simple.Elem`
+   * The unwrapped backing element type, for example `simple.Elem`, or a native non-yaidom element
    */
-  type UnwrappedBackingElem <: ScopedElemApi[UnwrappedBackingElem] with IsNavigableApi[UnwrappedBackingElem]
+  type UnwrappedBackingElem
 
   // Extra methods
 

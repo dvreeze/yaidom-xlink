@@ -43,9 +43,9 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 trait SimpleBridgeElem extends Any {
 
   /**
-   * The backing element type, for example `docaware.Elem`
+   * The backing element type, for example `docaware.Elem`, or a native non-yaidom element
    */
-  type BackingElem <: ScopedElemApi[BackingElem] with IsNavigableApi[BackingElem]
+  type BackingElem
 
   /**
    * The type of this bridge element itself
