@@ -20,11 +20,16 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
 import scala.Vector
+import scala.io.Source
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
 
 import eu.cdevreeze.yaidom.bridge.DefaultDocawareBridgeElem
+import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.core.ENameProvider
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.docaware
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.xlink.link.LinkLinkbaseEName
@@ -42,6 +47,10 @@ object TryToQueryManyLinkbases {
     val rootDir = new File(args(0))
 
     require(rootDir.isDirectory)
+
+    ENameProvider.globalENameProvider.become(new ENameProvider.ENameProviderUsingImmutableCache(knownENames))
+
+    QNameProvider.globalQNameProvider.become(new QNameProvider.QNameProviderUsingImmutableCache(knownQNames))
 
     val docParser = DocumentParserUsingSax.newInstance()
 
@@ -128,4 +137,32 @@ object TryToQueryManyLinkbases {
 
     println()
   }
+
+  private val knownENames: Set[EName] = {
+    val cls = classOf[TryToQueryManyLinkbases]
+
+    val linkENames =
+      Source.fromFile(new File(cls.getResource("enames-link.txt").toURI)).getLines().map(s => EName(s)).toSet
+    val xlinkENames =
+      Source.fromFile(new File(cls.getResource("enames-xlink.txt").toURI)).getLines().map(s => EName(s)).toSet
+    val xsENames =
+      Source.fromFile(new File(cls.getResource("enames-xs.txt").toURI)).getLines().map(s => EName(s)).toSet
+
+    linkENames union xlinkENames union xsENames
+  }
+
+  private val knownQNames: Set[QName] = {
+    val cls = classOf[TryToQueryManyLinkbases]
+
+    val linkQNames =
+      Source.fromFile(new File(cls.getResource("qnames-link.txt").toURI)).getLines().map(s => QName(s)).toSet
+    val xlinkQNames =
+      Source.fromFile(new File(cls.getResource("qnames-xlink.txt").toURI)).getLines().map(s => QName(s)).toSet
+    val xsQNames =
+      Source.fromFile(new File(cls.getResource("qnames-xs.txt").toURI)).getLines().map(s => QName(s)).toSet
+
+    linkQNames union xlinkQNames union xsQNames
+  }
 }
+
+class TryToQueryManyLinkbases
