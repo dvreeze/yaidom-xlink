@@ -139,29 +139,21 @@ object TryToQueryManyLinkbases {
   }
 
   private val knownENames: Set[EName] = {
-    val cls = classOf[TryToQueryManyLinkbases]
+    def getENames(fileName: String): Set[EName] = {
+      val cls = classOf[TryToQueryManyLinkbases]
+      Source.fromFile(new File(cls.getResource(fileName).toURI)).getLines().map(s => EName(s)).toSet
+    }
 
-    val linkENames =
-      Source.fromFile(new File(cls.getResource("enames-link.txt").toURI)).getLines().map(s => EName(s)).toSet
-    val xlinkENames =
-      Source.fromFile(new File(cls.getResource("enames-xlink.txt").toURI)).getLines().map(s => EName(s)).toSet
-    val xsENames =
-      Source.fromFile(new File(cls.getResource("enames-xs.txt").toURI)).getLines().map(s => EName(s)).toSet
-
-    linkENames union xlinkENames union xsENames
+    getENames("enames-link.txt").union(getENames("enames-xlink.txt")).union(getENames("enames-xs.txt"))
   }
 
   private val knownQNames: Set[QName] = {
-    val cls = classOf[TryToQueryManyLinkbases]
+    def getQNames(fileName: String): Set[QName] = {
+      val cls = classOf[TryToQueryManyLinkbases]
+      Source.fromFile(new File(cls.getResource(fileName).toURI)).getLines().map(s => QName(s)).toSet
+    }
 
-    val linkQNames =
-      Source.fromFile(new File(cls.getResource("qnames-link.txt").toURI)).getLines().map(s => QName(s)).toSet
-    val xlinkQNames =
-      Source.fromFile(new File(cls.getResource("qnames-xlink.txt").toURI)).getLines().map(s => QName(s)).toSet
-    val xsQNames =
-      Source.fromFile(new File(cls.getResource("qnames-xs.txt").toURI)).getLines().map(s => QName(s)).toSet
-
-    linkQNames union xlinkQNames union xsQNames
+    getQNames("qnames-link.txt").union(getQNames("qnames-xlink.txt")).union(getQNames("qnames-xs.txt"))
   }
 }
 
