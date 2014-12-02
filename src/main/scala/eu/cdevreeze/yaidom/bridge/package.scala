@@ -33,21 +33,20 @@ package eu.cdevreeze.yaidom
  * ==Design notes==
  *
  * Why do we need all this wrapping? After all, a simple element is wrapped in a more general `DefaultSimpleBridgeElem`
- * (possibly without any object creation costs), which is wrapped in a `SimpleWrapperElem` if you need the yaidom
- * query API on the "bridge element".
+ * (possibly without any object creation costs), which is wrapped in another element such as a `SimpleWrapperElem` that offers the
+ * appropriate query API.
  *
- * Had the yaidom query API traits been implemented using abstract types instead of type parameters, we would not have
- * needed to bridge between the use of generics for query API traits and the absence of generics in the bridge and
- * wrapper elements.
+ * The "XML dialect API" offers the appropriate query API traits, and they are backed by pluggable DOM-like (yaidom)
+ * element implementations (which themselves may wrap elements from other libraries). The pluggable yaidom "backends"
+ * are essentially combinations of query API traits. The type parameter (assuming only one such parameter for now)
+ * of the element type itself must be introduced somewhere, however. Existential types (like `ScopedElemApi[_]`) are
+ * no option. One option is to have the enclosing context introduce the type parameter, but that would mean the
+ * use of the cake pattern, which comes with some inconveniences. Another option is to make the "XML dialect API"
+ * inheritance tree generic. That is inconvenient too. That leaves us with a bridge between generic "backends" and
+ * non-generic XML dialect support. Again, indirection saves the day.
  *
- * On the other hand, it turned out to be far easier and more natural to model F-bounded polymorphism in the query API
- * traits using generics than using abstract types. This is not surprising: generics introduce a family of types
- * (which is indeed what the query API traits "are"), whereas abstract types just introduce a (type) member in one type.
- * For example, it is natural to think of one "instance of type" `ScopedElemApi` as the existential type:
- * {{{
- * ScopedElemApi[E] forSome { type E }
- * }}}
- * Existential types have been avoided in yaidom and yaidom-xlink, however.
+ * As an aside, yaidom uses generics instead of abstract types to model F-bounded polymorphism, because generics turned
+ * out to be a better fit to implement the query API.
  *
  * @author Chris de Vreeze
  */

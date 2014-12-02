@@ -28,11 +28,6 @@ import eu.cdevreeze.yaidom.core.EName
  *
  * The "DOM backend" is pluggable as long as there is a `DocawareBridgeElem` bridge for it.
  *
- * The model is easy to use inside other projects (using yaidom) for parts of the data.
- *
- * Note that in order for the model to be of maximum use, somehow there must be support for xsi:nil, XML Base and
- * XPointer (as restricted by XBRL).
- *
  * @author Chris de Vreeze
  */
 package object link {
