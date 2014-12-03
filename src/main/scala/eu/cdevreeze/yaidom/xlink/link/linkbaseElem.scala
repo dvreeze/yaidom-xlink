@@ -53,7 +53,7 @@ sealed abstract class LinkbaseElem private[link] (
   val bridgeElem: DocawareBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends ScopedElemLike[LinkbaseElem] with IsNavigable[LinkbaseElem] with SubtypeAwareElemLike[LinkbaseElem] {
 
-  require(childElems.map(_.bridgeElem.backingElem) == bridgeElem.findAllChildElems.map(_.backingElem))
+  assert(childElems.map(_.bridgeElem.backingElem) == bridgeElem.findAllChildElems.map(_.backingElem))
 
   /**
    * Very fast implementation of findAllChildElems, for fast querying
@@ -145,6 +145,8 @@ class SimpleLink private[link] (
   final def showOption: Option[String] = attributeOption(xl.XLink.XLinkShowEName)
 
   final def actuateOption: Option[String] = attributeOption(xl.XLink.XLinkActuateEName)
+
+  final def resolvedHref: URI = bridgeElem.baseUri.resolve(href)
 }
 
 // Extended links
@@ -399,6 +401,8 @@ abstract class Locator private[link] (
 
   final def titleElems: immutable.IndexedSeq[Title] =
     findAllChildElemsOfType(classTag[Title])
+
+  final def resolvedHref: URI = bridgeElem.baseUri.resolve(href)
 }
 
 final class StandardLocator private[link] (

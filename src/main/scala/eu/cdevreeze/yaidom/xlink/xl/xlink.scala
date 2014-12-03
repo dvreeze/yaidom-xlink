@@ -54,6 +54,9 @@ trait SimpleLink extends Link {
   def titleOption: Option[String]
   def showOption: Option[String]
   def actuateOption: Option[String]
+
+  /** Returns the href resolved against the base URI (which remains the same if the base URI is empty) */
+  def resolvedHref: URI
 }
 
 /** Extended link */
@@ -140,6 +143,9 @@ trait Locator extends LabeledXLink {
   def titleOption: Option[String]
 
   def titleElems: immutable.IndexedSeq[Title]
+
+  /** Returns the href resolved against the base URI (which remains the same if the base URI is empty) */
+  def resolvedHref: URI
 }
 
 /** Resource */
