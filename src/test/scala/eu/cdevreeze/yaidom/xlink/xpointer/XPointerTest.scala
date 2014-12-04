@@ -186,13 +186,14 @@ class XPointerTest extends Suite {
   }
 
   @Test def testUseMultipleXPointers(): Unit = {
-    val xpointers = XPointer.parseXPointers("element(intro/1/3/15/2)element(intro)element(all/2)")
+    val xpointers = XPointer.parseXPointers("element(intro/1/3/15/2)element(intro)element(all/2)element(/1/10000)")
 
     assertResult(
       List(
         IdChildSequencePointer("intro", List(1, 3, 15, 2)),
         IdPointer("intro"),
-        IdChildSequencePointer("all", List(2)))) {
+        IdChildSequencePointer("all", List(2)),
+        ChildSequencePointer(List(1, 10000)))) {
 
         xpointers
       }
