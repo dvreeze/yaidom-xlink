@@ -20,6 +20,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.indexed
+import XPointer.XPointerAwareDocument
+import eu.cdevreeze.yaidom.core.PathBuilder
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Path
 
 /**
  * XPointer test case.
@@ -29,7 +37,17 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class XPointerTest extends Suite {
 
-  @Test def testShorthandPointer(): Unit = {
+  private val XsNamespace = "http://www.w3.org/2001/XMLSchema"
+  private val LinkNamespace = "http://www.xbrl.org/2003/linkbase"
+
+  private val doc: indexed.Document = {
+    val uri = classOf[XPointerTest].getResource("/taxonomyrootdir/www.xbrl.org/2005/xbrldt-2005.xsd").toURI
+    val docParser = DocumentParserUsingSax.newInstance
+    val doc = docParser.parse(uri)
+    indexed.Document(doc)
+  }
+
+  @Test def testParseShorthandPointer(): Unit = {
     val xpointer = XPointer.parse("intro")
 
     assertResult(ShorthandPointer("intro")) {
@@ -37,7 +55,7 @@ class XPointerTest extends Suite {
     }
   }
 
-  @Test def testIdPointer(): Unit = {
+  @Test def testParseIdPointer(): Unit = {
     val xpointer = XPointer.parse("element(intro)")
 
     assertResult(IdPointer("intro")) {
@@ -45,7 +63,7 @@ class XPointerTest extends Suite {
     }
   }
 
-  @Test def testChildSeqPointer(): Unit = {
+  @Test def testParseChildSeqPointer(): Unit = {
     val xpointer = XPointer.parse("element(/1/3/15/2)")
 
     assertResult(ChildSequencePointer(List(1, 3, 15, 2))) {
@@ -53,7 +71,7 @@ class XPointerTest extends Suite {
     }
   }
 
-  @Test def testIdChildSeqPointer(): Unit = {
+  @Test def testParseIdChildSeqPointer(): Unit = {
     val xpointer = XPointer.parse("element(intro/1/3/15/2)")
 
     assertResult(IdChildSequencePointer("intro", List(1, 3, 15, 2))) {
@@ -61,7 +79,7 @@ class XPointerTest extends Suite {
     }
   }
 
-  @Test def testMultipleXPointers(): Unit = {
+  @Test def testParseMultipleXPointers(): Unit = {
     val xpointers = XPointer.parseXPointers("element(intro/1/3/15/2)element(intro)element(/1/3)")
 
     assertResult(
@@ -72,5 +90,128 @@ class XPointerTest extends Suite {
 
         xpointers
       }
+  }
+
+  @Test def testUseShorthandPointer(): Unit = {
+    val xpointer = XPointer.parse("all")
+
+    assertResult(ShorthandPointer("all")) {
+      xpointer
+    }
+
+    val elemOption = doc.findElemByXPointer(xpointer)
+
+    val scope = Scope.from("xs" -> XsNamespace, "link" -> LinkNamespace)
+
+    assertResult(true) {
+      elemOption.isDefined
+    }
+
+    assertResult(PathBuilder.from(QName("xs:annotation") -> 0, QName("xs:appinfo") -> 0, QName("link:arcroleType") -> 3).build(scope)) {
+      elemOption.get.path
+    }
+  }
+
+  @Test def testUseIdPointer(): Unit = {
+    val xpointer = XPointer.parse("element(notAll)")
+
+    assertResult(IdPointer("notAll")) {
+      xpointer
+    }
+
+    val elemOption = doc.findElemByXPointer(xpointer)
+
+    val scope = Scope.from("xs" -> XsNamespace, "link" -> LinkNamespace)
+
+    assertResult(true) {
+      elemOption.isDefined
+    }
+
+    assertResult(PathBuilder.from(
+      QName("xs:annotation") -> 0,
+      QName("xs:appinfo") -> 0,
+      QName("link:arcroleType") -> 4).build(scope)) {
+
+      elemOption.get.path
+    }
+  }
+
+  @Test def testUseChildSequencePointer(): Unit = {
+    val xpointer = XPointer.parse("element(/1/1/1/4)")
+
+    assertResult(ChildSequencePointer(List(1, 1, 1, 4))) {
+      xpointer
+    }
+
+    val elemOption = doc.findElemByXPointer(xpointer)
+
+    val scope = Scope.from("xs" -> XsNamespace, "link" -> LinkNamespace)
+
+    assertResult(true) {
+      elemOption.isDefined
+    }
+
+    assertResult(PathBuilder.from(
+      QName("xs:annotation") -> 0,
+      QName("xs:appinfo") -> 0,
+      QName("link:arcroleType") -> 3).build(scope)) {
+
+      elemOption.get.path
+    }
+  }
+
+  @Test def testUseIdChildSequencePointer(): Unit = {
+    val xpointer = XPointer.parse("element(all/2)")
+
+    assertResult(IdChildSequencePointer("all", List(2))) {
+      xpointer
+    }
+
+    val elemOption = doc.findElemByXPointer(xpointer)
+
+    val scope = Scope.from("xs" -> XsNamespace, "link" -> LinkNamespace)
+
+    assertResult(true) {
+      elemOption.isDefined
+    }
+
+    assertResult(PathBuilder.from(
+      QName("xs:annotation") -> 0,
+      QName("xs:appinfo") -> 0,
+      QName("link:arcroleType") -> 3,
+      QName("link:usedOn") -> 0).build(scope)) {
+
+      elemOption.get.path
+    }
+  }
+
+  @Test def testUseMultipleXPointers(): Unit = {
+    val xpointers = XPointer.parseXPointers("element(intro/1/3/15/2)element(intro)element(all/2)")
+
+    assertResult(
+      List(
+        IdChildSequencePointer("intro", List(1, 3, 15, 2)),
+        IdPointer("intro"),
+        IdChildSequencePointer("all", List(2)))) {
+
+        xpointers
+      }
+
+    val elemOption = doc.findElemByXPointers(xpointers)
+
+    val scope = Scope.from("xs" -> XsNamespace, "link" -> LinkNamespace)
+
+    assertResult(true) {
+      elemOption.isDefined
+    }
+
+    assertResult(PathBuilder.from(
+      QName("xs:annotation") -> 0,
+      QName("xs:appinfo") -> 0,
+      QName("link:arcroleType") -> 3,
+      QName("link:usedOn") -> 0).build(scope)) {
+
+      elemOption.get.path
+    }
   }
 }
