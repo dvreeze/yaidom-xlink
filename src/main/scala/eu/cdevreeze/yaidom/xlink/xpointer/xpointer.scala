@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom.xlink.xpointer
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
-import XPointer.IdEName
+import XPointer._
 
 /**
  * Shorthand and element scheme XPointers.
@@ -29,12 +29,6 @@ import XPointer.IdEName
 sealed trait XPointer {
 
   private[xpointer] def findElem[E <: ScopedElemApi[E]](doc: DocumentApi[E]): Option[E]
-
-  /**
-   * Finds the optional descendant-or-self element by this XPointer, with the given element as root.
-   * For child sequence pointers, the first position refers to a child element, and not to this element itself!
-   */
-  private[xpointer] def findElemOrSelf[E <: ScopedElemApi[E]](elem: E): Option[E]
 }
 
 /**
@@ -43,11 +37,7 @@ sealed trait XPointer {
 final case class ShorthandPointer(val id: String) extends XPointer {
 
   private[xpointer] def findElem[E <: ScopedElemApi[E]](doc: DocumentApi[E]): Option[E] = {
-    findElemOrSelf(doc.documentElement)
-  }
-
-  private[xpointer] def findElemOrSelf[E <: ScopedElemApi[E]](elem: E): Option[E] = {
-    elem.findElemOrSelf(e => e.attributeOption(IdEName) == Some(id))
+    findElemOrSelfById(doc.documentElement, id)
   }
 }
 
@@ -62,11 +52,7 @@ trait ElementSchemePointer extends XPointer
 final case class IdPointer(val id: String) extends ElementSchemePointer {
 
   private[xpointer] def findElem[E <: ScopedElemApi[E]](doc: DocumentApi[E]): Option[E] = {
-    findElemOrSelf(doc.documentElement)
-  }
-
-  private[xpointer] def findElemOrSelf[E <: ScopedElemApi[E]](elem: E): Option[E] = {
-    elem.findElemOrSelf(e => e.attributeOption(IdEName) == Some(id))
+    findElemOrSelfById(doc.documentElement, id)
   }
 }
 
@@ -76,25 +62,11 @@ final case class IdPointer(val id: String) extends ElementSchemePointer {
 final case class ChildSequencePointer(val childSeq: List[Int]) extends ElementSchemePointer {
   require(!childSeq.isEmpty, s"The child sequence must not be empty")
 
-  def tailOption: Option[ChildSequencePointer] = {
-    val tl = childSeq.tail
-    if (tl.isEmpty) None else Some(ChildSequencePointer(tl))
-  }
-
   private[xpointer] def findElem[E <: ScopedElemApi[E]](doc: DocumentApi[E]): Option[E] = childSeq match {
     case hd :: tl if hd == 1 =>
-      tailOption.map(xp => xp.findElemOrSelf(doc.documentElement)).getOrElse(Some(doc.documentElement))
-    case _ => None
-  }
+      val indices = tl.map(_ - 1)
 
-  private[xpointer] def findElemOrSelf[E <: ScopedElemApi[E]](elem: E): Option[E] = childSeq match {
-    case hd :: tl =>
-      val cheOption = elem.findAllChildElems.toStream.drop(hd - 1).headOption
-
-      if (tl.isEmpty) cheOption else {
-        // Recursive call
-        cheOption.flatMap(e => tailOption.get.findElemOrSelf(e))
-      }
+      findElemOrSelfByChildElemIndices(doc.documentElement, indices)
     case _ => None
   }
 }
@@ -106,15 +78,10 @@ final case class IdChildSequencePointer(val id: String, val childSeq: List[Int])
   require(!childSeq.isEmpty, s"The child sequence must not be empty")
 
   private[xpointer] def findElem[E <: ScopedElemApi[E]](doc: DocumentApi[E]): Option[E] = {
-    findElemOrSelf(doc.documentElement)
-  }
-
-  private[xpointer] def findElemOrSelf[E <: ScopedElemApi[E]](elem: E): Option[E] = {
-    val firstElemOption = IdPointer(id).findElemOrSelf(elem)
+    val firstElemOption = findElemOrSelfById(doc.documentElement, id)
 
     firstElemOption flatMap { e =>
-      val xp = ChildSequencePointer(childSeq)
-      xp.findElemOrSelf(e)
+      findElemOrSelfByChildElemIndices(e, childSeq.map(_ - 1))
     }
   }
 }
@@ -135,6 +102,18 @@ object XPointer {
       val idx = s.indexOf(")")
       // Recursive call
       parse(s.substring(0, idx + 1)) :: parseXPointers(s.substring(idx + 1))
+  }
+
+  private[xpointer] def findElemOrSelfById[E <: ScopedElemApi[E]](elem: E, id: String): Option[E] = {
+    elem.findElemOrSelf(e => e.attributeOption(IdEName) == Some(id))
+  }
+
+  private[xpointer] def findElemOrSelfByChildElemIndices[E <: ScopedElemApi[E]](elem: E, childElemIndices: List[Int]): Option[E] = childElemIndices match {
+    case Nil => Some(elem)
+    case hd :: tl =>
+      val cheOption = elem.findAllChildElems.toStream.drop(hd).headOption
+      // Recursive call
+      cheOption.flatMap(e => findElemOrSelfByChildElemIndices(e, tl))
   }
 
   /**
