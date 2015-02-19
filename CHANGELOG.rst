@@ -3,6 +3,14 @@ CHANGELOG
 =========
 
 
+1.3.3
+=====
+
+This version depends on yaidom 1.3.3.
+
+Moreover, added some XPointer support (in XBRL context).
+
+
 1.3.2
 =====
 
