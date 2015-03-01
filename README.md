@@ -7,19 +7,19 @@ Yaidom-based XLink and linkbase support.
 Usage
 =====
 
-Yaidom-xlink versions can be found in the Maven central repository. Assuming version 1.3.3, yaidom-xlink can be added as dependency
+Yaidom-xlink versions can be found in the Maven central repository. Assuming version 1.3.4, yaidom-xlink can be added as dependency
 as follows (in an SBT or Maven build):
 
 **SBT**::
 
-    libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom-xlink" % "1.3.3"
+    libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom-xlink" % "1.3.4"
 
 **Maven2**::
 
     <dependency>
       <groupId>eu.cdevreeze.yaidom</groupId>
       <artifactId>yaidom-xlink_2.11</artifactId>
-      <version>1.3.3</version>
+      <version>1.3.4</version>
     </dependency>
 
 Note that yaidom-xlink itself depends only on yaidom, and its dependencies.
