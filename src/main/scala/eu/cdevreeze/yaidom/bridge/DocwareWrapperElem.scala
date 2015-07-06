@@ -61,10 +61,6 @@ final class DocawareWrapperElem(val bridge: DocawareBridgeElem) extends Docaware
 
   final def text: String = bridge.text
 
-  final def findChildElemByPathEntry(entry: Path.Entry): Option[DocawareWrapperElem] = {
-    bridge.findChildElemByPathEntry(entry).map(e => new DocawareWrapperElem(e))
-  }
-
   final def toElem: eu.cdevreeze.yaidom.simple.Elem = bridge.toElem
 
   final def rootElem: UnwrappedBackingElem = bridge.rootElem

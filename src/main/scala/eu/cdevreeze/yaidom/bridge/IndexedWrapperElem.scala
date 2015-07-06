@@ -59,10 +59,6 @@ final class IndexedWrapperElem(val bridge: IndexedBridgeElem) extends IndexedBri
 
   final def text: String = bridge.text
 
-  final def findChildElemByPathEntry(entry: Path.Entry): Option[IndexedWrapperElem] = {
-    bridge.findChildElemByPathEntry(entry).map(e => new IndexedWrapperElem(e))
-  }
-
   final def toElem: eu.cdevreeze.yaidom.simple.Elem = bridge.toElem
 
   final def rootElem: UnwrappedBackingElem = bridge.rootElem

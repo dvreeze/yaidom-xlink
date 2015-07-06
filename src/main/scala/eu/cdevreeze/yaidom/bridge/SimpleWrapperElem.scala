@@ -57,9 +57,5 @@ final class SimpleWrapperElem(val bridge: SimpleBridgeElem) extends SimpleBridge
 
   final def text: String = bridge.text
 
-  final def findChildElemByPathEntry(entry: Path.Entry): Option[SimpleWrapperElem] = {
-    bridge.findChildElemByPathEntry(entry).map(e => new SimpleWrapperElem(e))
-  }
-
   final def toElem: eu.cdevreeze.yaidom.simple.Elem = bridge.toElem
 }

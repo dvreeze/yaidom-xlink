@@ -72,12 +72,9 @@ sealed abstract class LinkbaseElem private[link] (
 
   final def text: String = bridgeElem.text
 
-  final def findChildElemByPathEntry(entry: Path.Entry): Option[LinkbaseElem] =
-    childElems.toStream.filter(_.resolvedName == entry.elementName).drop(entry.index).headOption
-
   final override def equals(other: Any): Boolean = other match {
     case e: LinkbaseElem => bridgeElem.backingElem == e.bridgeElem.backingElem
-    case _ => false
+    case _               => false
   }
 
   final override def hashCode: Int = bridgeElem.backingElem.hashCode
@@ -584,74 +581,74 @@ object LinkbaseElem {
   private[link] def apply(elem: DocawareBridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): LinkbaseElem = {
     elem.backingElem.attributeOption(xl.XLink.XLinkTypeEName) match {
       case Some("extended") => applyForExtendedLink(elem, childElems)
-      case Some("simple") => applyForSimpleLink(elem, childElems)
-      case Some("arc") => applyForArc(elem, childElems)
-      case Some("locator") => applyForLocator(elem, childElems)
+      case Some("simple")   => applyForSimpleLink(elem, childElems)
+      case Some("arc")      => applyForArc(elem, childElems)
+      case Some("locator")  => applyForLocator(elem, childElems)
       case Some("resource") => applyForResource(elem, childElems)
-      case Some("title") => new Title(elem, childElems)
-      case Some(_) => sys.error(s"Not an XLink. Element name ${elem.resolvedName}")
+      case Some("title")    => new Title(elem, childElems)
+      case Some(_)          => sys.error(s"Not an XLink. Element name ${elem.resolvedName}")
       case None => elem.resolvedName match {
-        case LinkLinkbaseEName => new Linkbase(elem, childElems)
-        case LinkRoleTypeEName => new RoleType(elem, childElems)
-        case LinkArcroleTypeEName => new ArcroleType(elem, childElems)
-        case LinkDefinitionEName => new Definition(elem, childElems)
+        case LinkLinkbaseEName      => new Linkbase(elem, childElems)
+        case LinkRoleTypeEName      => new RoleType(elem, childElems)
+        case LinkArcroleTypeEName   => new ArcroleType(elem, childElems)
+        case LinkDefinitionEName    => new Definition(elem, childElems)
         case LinkDocumentationEName => new Documentation(elem, childElems)
-        case LinkUsedOnEName => new UsedOn(elem, childElems)
-        case _ => new LinkbaseElem(elem, childElems) {}
+        case LinkUsedOnEName        => new UsedOn(elem, childElems)
+        case _                      => new LinkbaseElem(elem, childElems) {}
       }
     }
   }
 
   private[link] def applyForExtendedLink(elem: DocawareBridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): ExtendedLink = {
     elem.resolvedName match {
-      case LinkLabelLinkEName => new LabelLink(elem, childElems)
-      case LinkReferenceLinkEName => new ReferenceLink(elem, childElems)
-      case LinkCalculationLinkEName => new CalculationLink(elem, childElems)
+      case LinkLabelLinkEName        => new LabelLink(elem, childElems)
+      case LinkReferenceLinkEName    => new ReferenceLink(elem, childElems)
+      case LinkCalculationLinkEName  => new CalculationLink(elem, childElems)
       case LinkPresentationLinkEName => new PresentationLink(elem, childElems)
-      case LinkDefinitionLinkEName => new DefinitionLink(elem, childElems)
-      case LinkFootnoteLinkEName => new FootnoteLink(elem, childElems)
-      case _ => new GenericLink(elem, childElems)
+      case LinkDefinitionLinkEName   => new DefinitionLink(elem, childElems)
+      case LinkFootnoteLinkEName     => new FootnoteLink(elem, childElems)
+      case _                         => new GenericLink(elem, childElems)
     }
   }
 
   private[link] def applyForSimpleLink(elem: DocawareBridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): SimpleLink = {
     elem.resolvedName match {
-      case LinkSchemaRefEName => new SchemaRef(elem, childElems)
+      case LinkSchemaRefEName   => new SchemaRef(elem, childElems)
       case LinkLinkbaseRefEName => new LinkbaseRef(elem, childElems)
-      case LinkRoleRefEName => new RoleRef(elem, childElems)
-      case LinkArcroleRefEName => new ArcroleRef(elem, childElems)
-      case _ => new SimpleLink(elem, childElems)
+      case LinkRoleRefEName     => new RoleRef(elem, childElems)
+      case LinkArcroleRefEName  => new ArcroleRef(elem, childElems)
+      case _                    => new SimpleLink(elem, childElems)
     }
   }
 
   private[link] def applyForArc(elem: DocawareBridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): Arc = {
     elem.resolvedName match {
-      case LinkLabelArcEName => new LabelArc(elem, childElems)
-      case LinkReferenceArcEName => new ReferenceArc(elem, childElems)
-      case LinkCalculationArcEName => new CalculationArc(elem, childElems)
+      case LinkLabelArcEName        => new LabelArc(elem, childElems)
+      case LinkReferenceArcEName    => new ReferenceArc(elem, childElems)
+      case LinkCalculationArcEName  => new CalculationArc(elem, childElems)
       case LinkPresentationArcEName => new PresentationArc(elem, childElems)
-      case LinkDefinitionArcEName => new DefinitionArc(elem, childElems)
-      case LinkFootnoteArcEName => new FootnoteArc(elem, childElems)
-      case GenArcEName => new GenericArc(elem, childElems)
-      case _ => sys.error(s"Not recognized as arc: ${elem.resolvedName}")
+      case LinkDefinitionArcEName   => new DefinitionArc(elem, childElems)
+      case LinkFootnoteArcEName     => new FootnoteArc(elem, childElems)
+      case GenArcEName              => new GenericArc(elem, childElems)
+      case _                        => sys.error(s"Not recognized as arc: ${elem.resolvedName}")
     }
   }
 
   private[link] def applyForLocator(elem: DocawareBridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): Locator = {
     elem.resolvedName match {
       case LinkLocEName => new StandardLocator(elem, childElems)
-      case _ => sys.error(s"Not recognized as locator: ${elem.resolvedName}")
+      case _            => sys.error(s"Not recognized as locator: ${elem.resolvedName}")
     }
   }
 
   private[link] def applyForResource(elem: DocawareBridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): Resource = {
     elem.resolvedName match {
-      case LinkLabelEName => new LabelResource(elem, childElems)
-      case LinkReferenceEName => new ReferenceResource(elem, childElems)
-      case LinkFootnoteEName => new FootnoteResource(elem, childElems)
-      case LabelLabelEName => new GenericLabelResource(elem, childElems)
+      case LinkLabelEName          => new LabelResource(elem, childElems)
+      case LinkReferenceEName      => new ReferenceResource(elem, childElems)
+      case LinkFootnoteEName       => new FootnoteResource(elem, childElems)
+      case LabelLabelEName         => new GenericLabelResource(elem, childElems)
       case ReferenceReferenceEName => new GenericReferenceResource(elem, childElems)
-      case _ => new GenericResource(elem, childElems)
+      case _                       => new GenericResource(elem, childElems)
     }
   }
 }
