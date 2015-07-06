@@ -9,7 +9,7 @@ organization := "eu.cdevreeze.yaidom"
 
 version := "1.4.0-SNAPSHOT"
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.6"
 
 crossScalaVersions := Seq("2.11.6", "2.10.5")
 
