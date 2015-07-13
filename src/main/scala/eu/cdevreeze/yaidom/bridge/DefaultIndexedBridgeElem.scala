@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.bridge
 
+import java.net.URI
+
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.EName
@@ -63,6 +65,14 @@ class DefaultIndexedBridgeElem(val backingElem: indexed.Elem) extends AnyVal wit
   final def path: Path = backingElem.path
 
   final def unwrappedBackingElem: UnwrappedBackingElem = backingElem.elem
+
+  final def baseUri: URI = {
+    val result = backingElem.baseUri
+    // The base URI must be absolute, but that is not checked here
+    result
+  }
+
+  final def docUri: URI = backingElem.docUri
 }
 
 object DefaultIndexedBridgeElem {

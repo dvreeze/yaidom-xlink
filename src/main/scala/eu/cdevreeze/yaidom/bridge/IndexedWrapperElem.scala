@@ -16,6 +16,8 @@
 
 package eu.cdevreeze.yaidom.bridge
 
+import java.net.URI
+
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.core.EName
@@ -33,7 +35,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  *
  * @author Chris de Vreeze
  */
-final class IndexedWrapperElem(val bridge: IndexedBridgeElem) extends IndexedBridgeElem with ScopedElemLike[IndexedWrapperElem] with IsNavigable[IndexedWrapperElem] { self: IndexedWrapperElem =>
+final class IndexedWrapperElem(val bridge: IndexedBridgeElem) extends IndexedBridgeElem with ScopedElemLike[IndexedWrapperElem] { self: IndexedWrapperElem =>
 
   final override type BackingElem = bridge.BackingElem
 
@@ -66,4 +68,8 @@ final class IndexedWrapperElem(val bridge: IndexedBridgeElem) extends IndexedBri
   final def path: Path = bridge.path
 
   final def unwrappedBackingElem: UnwrappedBackingElem = bridge.unwrappedBackingElem
+
+  final def baseUri: URI = bridge.baseUri
+
+  final def docUri: URI = bridge.docUri
 }

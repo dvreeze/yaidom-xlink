@@ -16,8 +16,9 @@
 
 package eu.cdevreeze.yaidom.bridge
 
+import java.net.URI
+
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.IsNavigableApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 
 /**
@@ -40,7 +41,7 @@ trait IndexedBridgeElem extends Any with SimpleBridgeElem {
   /**
    * The unwrapped backing element type, for example `simple.Elem`
    */
-  type UnwrappedBackingElem <: ScopedElemApi[UnwrappedBackingElem] with IsNavigableApi[UnwrappedBackingElem]
+  type UnwrappedBackingElem <: ScopedElemApi[UnwrappedBackingElem]
 
   // Extra methods
 
@@ -49,4 +50,14 @@ trait IndexedBridgeElem extends Any with SimpleBridgeElem {
   def path: Path
 
   def unwrappedBackingElem: UnwrappedBackingElem
+
+  /**
+   * Returns the base URI of the element, by XML Base processing starting with the document URI
+   */
+  def baseUri: URI
+
+  /**
+   * Returns the document URI
+   */
+  def docUri: URI
 }

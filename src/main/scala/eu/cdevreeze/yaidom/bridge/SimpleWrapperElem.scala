@@ -33,7 +33,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
  *
  * @author Chris de Vreeze
  */
-final class SimpleWrapperElem(val bridge: SimpleBridgeElem) extends SimpleBridgeElem with ScopedElemLike[SimpleWrapperElem] with IsNavigable[SimpleWrapperElem] { self: SimpleWrapperElem =>
+final class SimpleWrapperElem(val bridge: SimpleBridgeElem) extends SimpleBridgeElem with ScopedElemLike[SimpleWrapperElem] { self: SimpleWrapperElem =>
 
   final override type BackingElem = bridge.BackingElem
 

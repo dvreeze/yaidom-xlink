@@ -24,11 +24,11 @@ import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.bridge.DefaultDocawareBridgeElem
+import eu.cdevreeze.yaidom.bridge.DefaultIndexedBridgeElem
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.docaware
+import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
@@ -49,7 +49,7 @@ class LinkbaseTest extends Suite {
     val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/202-01-HrefResolution-label.xml").toURI
 
     val doc = docParser.parse(docUri)
-    val bridgeElem = new DefaultDocawareBridgeElem(docaware.Document(docUri, doc).documentElement)
+    val bridgeElem = new DefaultIndexedBridgeElem(indexed.Document(docUri, doc).documentElement)
 
     val linkbase = Linkbase(bridgeElem)
 
@@ -148,7 +148,7 @@ class LinkbaseTest extends Suite {
     val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/291-11-ArcOverrideReferenceLinkbases-2-reference.xml").toURI
 
     val doc = docParser.parse(docUri)
-    val bridgeElem = new DefaultDocawareBridgeElem(docaware.Document(docUri, doc).documentElement)
+    val bridgeElem = new DefaultIndexedBridgeElem(indexed.Document(docUri, doc).documentElement)
 
     val linkbase = Linkbase(bridgeElem)
 
@@ -251,7 +251,7 @@ class LinkbaseTest extends Suite {
     val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/DecArcCyclesUD_definition.xml").toURI
 
     val doc = docParser.parse(docUri)
-    val bridgeElem = new DefaultDocawareBridgeElem(docaware.Document(docUri, doc).documentElement)
+    val bridgeElem = new DefaultIndexedBridgeElem(indexed.Document(docUri, doc).documentElement)
 
     val linkbase = Linkbase(bridgeElem)
 
@@ -298,7 +298,7 @@ class LinkbaseTest extends Suite {
     val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/ArcRoleDR_presentation.xml").toURI
 
     val doc = docParser.parse(docUri)
-    val bridgeElem = new DefaultDocawareBridgeElem(docaware.Document(docUri, doc).documentElement)
+    val bridgeElem = new DefaultIndexedBridgeElem(indexed.Document(docUri, doc).documentElement)
 
     val linkbase = Linkbase(bridgeElem)
 
@@ -328,7 +328,7 @@ class LinkbaseTest extends Suite {
     val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/ArcCyclesSIUC_calculation.xml").toURI
 
     val doc = docParser.parse(docUri)
-    val bridgeElem = new DefaultDocawareBridgeElem(docaware.Document(docUri, doc).documentElement)
+    val bridgeElem = new DefaultIndexedBridgeElem(indexed.Document(docUri, doc).documentElement)
 
     val linkbase = Linkbase(bridgeElem)
 
@@ -361,7 +361,7 @@ class LinkbaseTest extends Suite {
     val docUri = classOf[LinkbaseTest].getResource("/sample-generic-linkbase.xml").toURI
 
     val doc = docParser.parse(docUri)
-    val bridgeElem = new DefaultDocawareBridgeElem(docaware.Document(docUri, doc).documentElement)
+    val bridgeElem = new DefaultIndexedBridgeElem(indexed.Document(docUri, doc).documentElement)
 
     val linkbase = Linkbase(bridgeElem)
 

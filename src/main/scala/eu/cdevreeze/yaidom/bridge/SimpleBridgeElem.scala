@@ -26,7 +26,7 @@ import eu.cdevreeze.yaidom.queryapi.IsNavigableApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 
 /**
- * Bridge element that enables the `ScopedElemLike with IsNavigableLike` API (and more) on the classes delegating to this bridge element.
+ * Bridge element that enables the `ScopedElemLike` API (and more) on the classes delegating to this bridge element.
  *
  * It offers pluggable DOM-like element implementations, without any "type gymnastics" and without paying any
  * "cake pattern tax".
@@ -38,9 +38,9 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 trait SimpleBridgeElem extends Any {
 
   /**
-   * The backing element type, for example `docaware.Elem`
+   * The backing element type, for example `indexed.Elem`
    */
-  type BackingElem <: ScopedElemApi[BackingElem] with IsNavigableApi[BackingElem]
+  type BackingElem <: ScopedElemApi[BackingElem]
 
   /**
    * The type of this bridge element itself

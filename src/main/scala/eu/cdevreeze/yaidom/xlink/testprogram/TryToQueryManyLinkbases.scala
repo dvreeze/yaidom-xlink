@@ -25,12 +25,12 @@ import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
 
-import eu.cdevreeze.yaidom.bridge.DefaultDocawareBridgeElem
+import eu.cdevreeze.yaidom.bridge.DefaultIndexedBridgeElem
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.ENameProvider
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
-import eu.cdevreeze.yaidom.docaware
+import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.xlink.link.LinkLinkbaseEName
 import eu.cdevreeze.yaidom.xlink.link.Linkbase
@@ -73,11 +73,11 @@ object TryToQueryManyLinkbases {
 
     val linkbaseTries: Vector[Try[Linkbase]] = docs collect {
       case doc if doc.documentElement.resolvedName == LinkLinkbaseEName =>
-        Try(Linkbase(DefaultDocawareBridgeElem.wrap(docaware.Elem(doc.uriOption.get, doc.documentElement))))
+        Try(Linkbase(DefaultIndexedBridgeElem.wrap(indexed.Elem(doc.uriOption.get, doc.documentElement))))
     }
     val linkbases: Vector[Linkbase] = linkbaseTries flatMap {
       case Success(linkbase) => Some(linkbase)
-      case Failure(t) => println(s"Could not instantiate a linkbase. Exception: $t"); None
+      case Failure(t)        => println(s"Could not instantiate a linkbase. Exception: $t"); None
     }
 
     println(s"Instantiated ${linkbases.size} linkbase documents.")
