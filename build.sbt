@@ -9,13 +9,13 @@ organization := "eu.cdevreeze.yaidom"
 
 version := "1.4.0-SNAPSHOT"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.7"
 
-crossScalaVersions := Seq("2.11.6", "2.10.5")
+crossScalaVersions := Seq("2.11.7", "2.10.5")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
-libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "1.4.0-M2"
+libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "1.4.0-M3"
 
 libraryDependencies += "junit" % "junit" % "4.12" % "test"
 
