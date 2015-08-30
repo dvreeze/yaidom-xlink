@@ -32,6 +32,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
+import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.xlink.link.LinkLinkbaseEName
 import eu.cdevreeze.yaidom.xlink.link.Linkbase
 
@@ -51,6 +52,8 @@ object TryToQueryManyLinkbases {
     ENameProvider.globalENameProvider.become(new ENameProvider.ENameProviderUsingImmutableCache(knownENames))
 
     QNameProvider.globalQNameProvider.become(new QNameProvider.QNameProviderUsingImmutableCache(knownQNames))
+
+    val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
     val docParser = DocumentParserUsingStax.newInstance()
 
@@ -73,7 +76,7 @@ object TryToQueryManyLinkbases {
 
     val linkbaseTries: Vector[Try[Linkbase]] = docs collect {
       case doc if doc.documentElement.resolvedName == LinkLinkbaseEName =>
-        Try(Linkbase(DefaultIndexedBridgeElem.wrap(indexed.Elem(doc.uriOption.get, doc.documentElement))))
+        Try(Linkbase(DefaultIndexedBridgeElem.wrap(indexedElemBuilder.build(doc.uriOption, doc.documentElement))))
     }
     val linkbases: Vector[Linkbase] = linkbaseTries flatMap {
       case Success(linkbase) => Some(linkbase)
