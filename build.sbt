@@ -11,11 +11,11 @@ version := "1.4.3-SNAPSHOT"
 
 scalaVersion := "2.11.7"
 
-crossScalaVersions := Seq("2.11.7", "2.10.5")
+crossScalaVersions := Seq("2.11.7", "2.10.6")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
-libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "1.4.2"
+libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "1.5.0-M1"
 
 libraryDependencies += "junit" % "junit" % "4.12" % "test"
 
