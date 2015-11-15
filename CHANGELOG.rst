@@ -3,6 +3,12 @@ CHANGELOG
 =========
 
 
+1.5.0-M2
+========
+
+This version depends on yaidom 1.5.0-M2.
+
+
 1.5.0-M1
 ========
 

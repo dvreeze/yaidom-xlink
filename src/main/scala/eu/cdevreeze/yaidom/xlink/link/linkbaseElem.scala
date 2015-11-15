@@ -283,7 +283,7 @@ abstract class Arc private[link] (
   bridgeElem: IndexedBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(bridgeElem, childElems) with xl.Arc {
 
-  require(!bridgeElem.path.isRoot, s"Missing parent extended link of $resolvedName")
+  require(!bridgeElem.path.isEmpty, s"Missing parent extended link of $resolvedName")
 
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeArc
 
@@ -381,7 +381,7 @@ abstract class Locator private[link] (
   bridgeElem: IndexedBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(bridgeElem, childElems) with xl.Locator {
 
-  require(!bridgeElem.path.isRoot, s"Missing parent extended link of $resolvedName")
+  require(!bridgeElem.path.isEmpty, s"Missing parent extended link of $resolvedName")
 
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeLocator
 
@@ -418,7 +418,7 @@ abstract class Resource private[link] (
   bridgeElem: IndexedBridgeElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(bridgeElem, childElems) with xl.Resource {
 
-  require(!bridgeElem.path.isRoot, s"Missing parent extended link of $resolvedName")
+  require(!bridgeElem.path.isEmpty, s"Missing parent extended link of $resolvedName")
 
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeResource
 
