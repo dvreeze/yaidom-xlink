@@ -13,7 +13,7 @@ scalaVersion := "2.11.7"
 
 crossScalaVersions := Seq("2.11.7", "2.10.6")
 
-scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint")
 
 libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "1.5.0"
 
