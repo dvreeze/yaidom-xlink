@@ -17,6 +17,7 @@
 package eu.cdevreeze.yaidom.xlink.testprogram
 
 import java.io.File
+import java.net.URI
 import java.util.concurrent.atomic.AtomicInteger
 
 import scala.Vector
@@ -25,14 +26,12 @@ import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
 
-import eu.cdevreeze.yaidom.bridge.DefaultIndexedBridgeElem
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.ENameProvider
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.xlink.link.LinkLinkbaseEName
 import eu.cdevreeze.yaidom.xlink.link.Linkbase
 
@@ -52,8 +51,6 @@ object TryToQueryManyLinkbases {
     ENameProvider.globalENameProvider.become(new ENameProvider.ENameProviderUsingImmutableCache(knownENames))
 
     QNameProvider.globalQNameProvider.become(new QNameProvider.QNameProviderUsingImmutableCache(knownQNames))
-
-    val indexedElemBuilder = indexed.Elem.Builder(XmlBaseSupport.JdkUriResolver)
 
     val docParser = DocumentParserUsingStax.newInstance()
 
@@ -76,7 +73,7 @@ object TryToQueryManyLinkbases {
 
     val linkbaseTries: Vector[Try[Linkbase]] = docs collect {
       case doc if doc.documentElement.resolvedName == LinkLinkbaseEName =>
-        Try(Linkbase(DefaultIndexedBridgeElem.wrap(indexedElemBuilder.build(doc.uriOption, doc.documentElement))))
+        Try(Linkbase(indexed.Elem(doc.uriOption, doc.documentElement)))
     }
     val linkbases: Vector[Linkbase] = linkbaseTries flatMap {
       case Success(linkbase) => Some(linkbase)
@@ -112,7 +109,7 @@ object TryToQueryManyLinkbases {
   private def performLinkbaseQueries(linkbase: Linkbase): Unit = {
     val extendedLinks = linkbase.extendedLinks
 
-    println(s"Linkbase ${linkbase.bridgeElem.docUri} has ${extendedLinks.size} extended links")
+    println(s"Linkbase ${linkbase.bridgeElem.docUriOption.getOrElse(URI.create(""))} has ${extendedLinks.size} extended links")
 
     for (extendedLink <- extendedLinks) {
       val elr = extendedLink.role
@@ -122,19 +119,19 @@ object TryToQueryManyLinkbases {
       val brokenXLinkLabels = arcFromTos.diff(extendedLink.labeledXLinks.keySet)
 
       if (!brokenXLinkLabels.isEmpty) {
-        println(s"Linkbase ${linkbase.bridgeElem.docUri} (ELR $elr) has broken XLink labels: ${brokenXLinkLabels.toSeq.sorted}")
+        println(s"Linkbase ${linkbase.bridgeElem.docUriOption.getOrElse(URI.create(""))} (ELR $elr) has broken XLink labels: ${brokenXLinkLabels.toSeq.sorted}")
       }
 
       val unusedXLinkLabels = extendedLink.labeledXLinks.keySet.diff(arcFromTos)
 
       if (!unusedXLinkLabels.isEmpty) {
-        println(s"Linkbase ${linkbase.bridgeElem.docUri} (ELR $elr) has unused XLink labels: ${unusedXLinkLabels.toSeq.sorted}")
+        println(s"Linkbase ${linkbase.bridgeElem.docUriOption.getOrElse(URI.create(""))} (ELR $elr) has unused XLink labels: ${unusedXLinkLabels.toSeq.sorted}")
       }
 
       val nonUniqueXLinkLabels = extendedLink.labeledXLinks.filter(_._2.size >= 2).keySet
 
       if (!nonUniqueXLinkLabels.isEmpty) {
-        println(s"Linkbase ${linkbase.bridgeElem.docUri} (ELR $elr) has non-unique XLink labels: ${nonUniqueXLinkLabels.toSeq.sorted}")
+        println(s"Linkbase ${linkbase.bridgeElem.docUriOption.getOrElse(URI.create(""))} (ELR $elr) has non-unique XLink labels: ${nonUniqueXLinkLabels.toSeq.sorted}")
       }
     }
 

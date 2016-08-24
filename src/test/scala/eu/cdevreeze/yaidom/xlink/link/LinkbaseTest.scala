@@ -24,13 +24,11 @@ import org.junit.runner.RunWith
 import org.scalatest.Suite
 import org.scalatest.junit.JUnitRunner
 
-import eu.cdevreeze.yaidom.bridge.DefaultIndexedBridgeElem
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.xlink.xl
@@ -43,8 +41,6 @@ import eu.cdevreeze.yaidom.xlink.xl
 @RunWith(classOf[JUnitRunner])
 class LinkbaseTest extends Suite {
 
-  private val uriResolver = XmlBaseSupport.JdkUriResolver
-
   @Test def testReconstructLabelLinkbase(): Unit = {
     val docParser = DocumentParserUsingDom.newInstance
 
@@ -53,7 +49,7 @@ class LinkbaseTest extends Suite {
 
     val doc = docParser.parse(docUri)
     val bridgeElem =
-      new DefaultIndexedBridgeElem(indexed.Document.from(doc.withUriOption(Some(docUri)), uriResolver).documentElement)
+      indexed.Document.from(doc.withUriOption(Some(docUri))).documentElement
 
     val linkbase = Linkbase(bridgeElem)
 
@@ -127,7 +123,7 @@ class LinkbaseTest extends Suite {
             scope,
             locs ++ labels ++ arcs)))
 
-    val original = resolved.Elem(linkbase.bridgeElem.toElem).removeAllInterElementWhitespace
+    val original = resolved.Elem(linkbase.bridgeElem.asInstanceOf[indexed.Elem].underlyingElem).removeAllInterElementWhitespace
 
     val reconstructed = resolved.Elem(lb).removeAllInterElementWhitespace
 
@@ -153,7 +149,7 @@ class LinkbaseTest extends Suite {
 
     val doc = docParser.parse(docUri)
     val bridgeElem =
-      new DefaultIndexedBridgeElem(indexed.Document.from(doc.withUriOption(Some(docUri)), uriResolver).documentElement)
+      indexed.Document.from(doc.withUriOption(Some(docUri))).documentElement
 
     val linkbase = Linkbase(bridgeElem)
 
@@ -217,7 +213,7 @@ class LinkbaseTest extends Suite {
         plusAttribute(QName("xlink:type"), ref.xlinkType.toString).
         plusAttribute(QName("xlink:label"), ref.label).
         plusAttributeOption(QName("xlink:role"), ref.roleOption).
-        withChildren(ref.findAllChildElems.map(_.bridgeElem.toElem))
+        withChildren(ref.findAllChildElems.map(_.bridgeElem.asInstanceOf[indexed.Elem].underlyingElem))
     }
 
     val lb =
@@ -231,7 +227,7 @@ class LinkbaseTest extends Suite {
             scope,
             locs ++ references ++ arcs)))
 
-    val original = resolved.Elem(linkbase.bridgeElem.toElem).removeAllInterElementWhitespace
+    val original = resolved.Elem(linkbase.bridgeElem.asInstanceOf[indexed.Elem].underlyingElem).removeAllInterElementWhitespace
 
     val reconstructed = resolved.Elem(lb).removeAllInterElementWhitespace
 
@@ -257,7 +253,7 @@ class LinkbaseTest extends Suite {
 
     val doc = docParser.parse(docUri)
     val bridgeElem =
-      new DefaultIndexedBridgeElem(indexed.Document.from(doc.withUriOption(Some(docUri)), uriResolver).documentElement)
+      indexed.Document.from(doc.withUriOption(Some(docUri))).documentElement
 
     val linkbase = Linkbase(bridgeElem)
 
@@ -305,7 +301,7 @@ class LinkbaseTest extends Suite {
 
     val doc = docParser.parse(docUri)
     val bridgeElem =
-      new DefaultIndexedBridgeElem(indexed.Document.from(doc.withUriOption(Some(docUri)), uriResolver).documentElement)
+      indexed.Document.from(doc.withUriOption(Some(docUri))).documentElement
 
     val linkbase = Linkbase(bridgeElem)
 
@@ -336,7 +332,7 @@ class LinkbaseTest extends Suite {
 
     val doc = docParser.parse(docUri)
     val bridgeElem =
-      new DefaultIndexedBridgeElem(indexed.Document.from(doc.withUriOption(Some(docUri)), uriResolver).documentElement)
+      indexed.Document.from(doc.withUriOption(Some(docUri))).documentElement
 
     val linkbase = Linkbase(bridgeElem)
 
@@ -370,7 +366,7 @@ class LinkbaseTest extends Suite {
 
     val doc = docParser.parse(docUri)
     val bridgeElem =
-      new DefaultIndexedBridgeElem(indexed.Document.from(doc.withUriOption(Some(docUri)), uriResolver).documentElement)
+      indexed.Document.from(doc.withUriOption(Some(docUri))).documentElement
 
     val linkbase = Linkbase(bridgeElem)
 

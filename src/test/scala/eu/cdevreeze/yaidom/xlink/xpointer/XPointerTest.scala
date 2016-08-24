@@ -28,7 +28,6 @@ import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 
 /**
  * XPointer test case.
@@ -41,13 +40,11 @@ class XPointerTest extends Suite {
   private val XsNamespace = "http://www.w3.org/2001/XMLSchema"
   private val LinkNamespace = "http://www.xbrl.org/2003/linkbase"
 
-  private val uriResolver = XmlBaseSupport.JdkUriResolver
-
   private val doc: indexed.Document = {
     val uri = classOf[XPointerTest].getResource("/taxonomyrootdir/www.xbrl.org/2005/xbrldt-2005.xsd").toURI
     val docParser = DocumentParserUsingSax.newInstance
     val doc = docParser.parse(uri)
-    indexed.Document.from(doc, uriResolver)
+    indexed.Document.from(doc)
   }
 
   @Test def testParseShorthandPointer(): Unit = {

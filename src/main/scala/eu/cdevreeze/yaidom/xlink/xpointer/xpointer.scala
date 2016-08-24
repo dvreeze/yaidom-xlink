@@ -28,7 +28,7 @@ import XPointer._
  */
 sealed trait XPointer {
 
-  private[xpointer] def findElem[E <: ScopedElemApi[E]](doc: DocumentApi[E]): Option[E]
+  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[E]): Option[E]
 }
 
 /**
@@ -36,7 +36,7 @@ sealed trait XPointer {
  */
 final case class ShorthandPointer(val id: String) extends XPointer {
 
-  private[xpointer] def findElem[E <: ScopedElemApi[E]](doc: DocumentApi[E]): Option[E] = {
+  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[E]): Option[E] = {
     findElemOrSelfById(doc.documentElement, id)
   }
 }
@@ -51,7 +51,7 @@ trait ElementSchemePointer extends XPointer
  */
 final case class IdPointer(val id: String) extends ElementSchemePointer {
 
-  private[xpointer] def findElem[E <: ScopedElemApi[E]](doc: DocumentApi[E]): Option[E] = {
+  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[E]): Option[E] = {
     findElemOrSelfById(doc.documentElement, id)
   }
 }
@@ -62,7 +62,7 @@ final case class IdPointer(val id: String) extends ElementSchemePointer {
 final case class ChildSequencePointer(val childSeq: List[Int]) extends ElementSchemePointer {
   require(!childSeq.isEmpty, s"The child sequence must not be empty")
 
-  private[xpointer] def findElem[E <: ScopedElemApi[E]](doc: DocumentApi[E]): Option[E] = childSeq match {
+  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[E]): Option[E] = childSeq match {
     case hd :: tl if hd == 1 =>
       val indices = tl.map(_ - 1)
 
@@ -77,7 +77,7 @@ final case class ChildSequencePointer(val childSeq: List[Int]) extends ElementSc
 final case class IdChildSequencePointer(val id: String, val childSeq: List[Int]) extends ElementSchemePointer {
   require(!childSeq.isEmpty, s"The child sequence must not be empty")
 
-  private[xpointer] def findElem[E <: ScopedElemApi[E]](doc: DocumentApi[E]): Option[E] = {
+  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[E]): Option[E] = {
     val firstElemOption = findElemOrSelfById(doc.documentElement, id)
 
     firstElemOption flatMap { e =>
@@ -92,11 +92,11 @@ object XPointer {
 
   def parse(s: String): XPointer = s match {
     case s if !s.trim.startsWith("element(") => ShorthandPointer(s)
-    case s => ElementSchemePointer.parse(s)
+    case s                                   => ElementSchemePointer.parse(s)
   }
 
   def parseXPointers(s: String): List[XPointer] = s match {
-    case s if s.isEmpty => Nil
+    case s if s.isEmpty                      => Nil
     case s if !s.trim.startsWith("element(") => List(ShorthandPointer(s))
     case s =>
       val idx = s.indexOf(")")
@@ -104,11 +104,11 @@ object XPointer {
       parse(s.substring(0, idx + 1)) :: parseXPointers(s.substring(idx + 1))
   }
 
-  private[xpointer] def findElemOrSelfById[E <: ScopedElemApi[E]](elem: E, id: String): Option[E] = {
+  private[xpointer] def findElemOrSelfById[E <: ScopedElemApi.Aux[E]](elem: E, id: String): Option[E] = {
     elem.findElemOrSelf(e => e.attributeOption(IdEName) == Some(id))
   }
 
-  private[xpointer] def findElemOrSelfByChildElemIndices[E <: ScopedElemApi[E]](elem: E, childElemIndices: List[Int]): Option[E] = childElemIndices match {
+  private[xpointer] def findElemOrSelfByChildElemIndices[E <: ScopedElemApi.Aux[E]](elem: E, childElemIndices: List[Int]): Option[E] = childElemIndices match {
     case Nil => Some(elem)
     case hd :: tl =>
       val cheOption = elem.findAllChildElems.toStream.drop(hd).headOption
@@ -120,7 +120,7 @@ object XPointer {
    * Adds XPointer-awareness to a documents that offers the ScopedElemApi query API for its elements.
    * That is, adds functions findElemByXPointer and findElemByXPointers.
    */
-  implicit final class XPointerAwareDocument[E <: ScopedElemApi[E]](val doc: DocumentApi[E]) {
+  implicit final class XPointerAwareDocument[E <: ScopedElemApi.Aux[E]](val doc: DocumentApi.Aux[E]) {
 
     def findElemByXPointer(xpointer: XPointer): Option[E] = xpointer.findElem(doc)
 
@@ -141,7 +141,7 @@ object ElementSchemePointer {
 
     data match {
       case d if d.startsWith("/") => ChildSequencePointer(d.substring(1).split('/').toList.map(_.toInt))
-      case d if !d.contains("/") => IdPointer(d)
+      case d if !d.contains("/")  => IdPointer(d)
       case d =>
         val idx = d.indexOf("/")
         val id = d.substring(0, idx)
