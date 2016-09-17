@@ -11,15 +11,21 @@ version := "1.6.0-SNAPSHOT"
 
 scalaVersion := "2.11.7"
 
-crossScalaVersions := Seq("2.11.7")
+crossScalaVersions := Seq("2.11.7", "2.12.0-RC1")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint")
 
-libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "1.6.0-M4"
+libraryDependencies <+= scalaBinaryVersion apply { version =>
+  if (version.contains("2.12.0-RC1")) "eu.cdevreeze.yaidom" % "yaidom_2.12.0-RC1" % "1.6.0-M4"
+  else "eu.cdevreeze.yaidom" %% "yaidom" % "1.6.0-M4"
+}
 
 libraryDependencies += "junit" % "junit" % "4.12" % "test"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
+libraryDependencies <+= scalaBinaryVersion apply { version =>
+  if (version.contains("2.12.0-RC1")) "org.scalatest" % "scalatest_2.12.0-RC1" % "3.0.0" % "test"
+  else "org.scalatest" %% "scalatest" % "3.0.0" % "test"
+}
 
 // resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
 
