@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom.xlink
 import java.net.URI
 
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.queryapi.IndexedScopedElemApi
+import eu.cdevreeze.yaidom.queryapi.BackingElemApi
 
 /**
  * This package models XBRL linkbases.
@@ -27,13 +27,13 @@ import eu.cdevreeze.yaidom.queryapi.IndexedScopedElemApi
  * The model can be populated if it obeys the relevant schema: xbrl-linkbase-2003-12-31.xsd (which imports
  * xl-2003-12-31.xsd and xlink-2003-12-31.xsd).
  *
- * The "DOM backend" is pluggable as long as there is a `BridgeElem` bridge for it.
+ * The "DOM backend" is pluggable as long as it is a BackingElemApi.
  *
  * @author Chris de Vreeze
  */
 package object link {
 
-  type BridgeElem = IndexedScopedElemApi
+  type BackingElem = BackingElemApi
 
   val LinkNamespace = URI.create("http://www.xbrl.org/2003/linkbase").toString
   val GenNamespace = URI.create("http://xbrl.org/2008/generic").toString

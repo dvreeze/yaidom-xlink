@@ -109,7 +109,7 @@ object TryToQueryManyLinkbases {
   private def performLinkbaseQueries(linkbase: Linkbase): Unit = {
     val extendedLinks = linkbase.extendedLinks
 
-    println(s"Linkbase ${linkbase.bridgeElem.docUriOption.getOrElse(URI.create(""))} has ${extendedLinks.size} extended links")
+    println(s"Linkbase ${linkbase.backingElem.docUriOption.getOrElse(URI.create(""))} has ${extendedLinks.size} extended links")
 
     for (extendedLink <- extendedLinks) {
       val elr = extendedLink.role
@@ -119,19 +119,19 @@ object TryToQueryManyLinkbases {
       val brokenXLinkLabels = arcFromTos.diff(extendedLink.labeledXLinks.keySet)
 
       if (!brokenXLinkLabels.isEmpty) {
-        println(s"Linkbase ${linkbase.bridgeElem.docUriOption.getOrElse(URI.create(""))} (ELR $elr) has broken XLink labels: ${brokenXLinkLabels.toSeq.sorted}")
+        println(s"Linkbase ${linkbase.backingElem.docUriOption.getOrElse(URI.create(""))} (ELR $elr) has broken XLink labels: ${brokenXLinkLabels.toSeq.sorted}")
       }
 
       val unusedXLinkLabels = extendedLink.labeledXLinks.keySet.diff(arcFromTos)
 
       if (!unusedXLinkLabels.isEmpty) {
-        println(s"Linkbase ${linkbase.bridgeElem.docUriOption.getOrElse(URI.create(""))} (ELR $elr) has unused XLink labels: ${unusedXLinkLabels.toSeq.sorted}")
+        println(s"Linkbase ${linkbase.backingElem.docUriOption.getOrElse(URI.create(""))} (ELR $elr) has unused XLink labels: ${unusedXLinkLabels.toSeq.sorted}")
       }
 
       val nonUniqueXLinkLabels = extendedLink.labeledXLinks.filter(_._2.size >= 2).keySet
 
       if (!nonUniqueXLinkLabels.isEmpty) {
-        println(s"Linkbase ${linkbase.bridgeElem.docUriOption.getOrElse(URI.create(""))} (ELR $elr) has non-unique XLink labels: ${nonUniqueXLinkLabels.toSeq.sorted}")
+        println(s"Linkbase ${linkbase.backingElem.docUriOption.getOrElse(URI.create(""))} (ELR $elr) has non-unique XLink labels: ${nonUniqueXLinkLabels.toSeq.sorted}")
       }
     }
 

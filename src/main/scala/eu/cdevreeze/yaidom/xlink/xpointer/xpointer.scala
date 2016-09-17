@@ -28,7 +28,7 @@ import XPointer._
  */
 sealed trait XPointer {
 
-  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[E]): Option[E]
+  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[_, E]): Option[E]
 }
 
 /**
@@ -36,7 +36,7 @@ sealed trait XPointer {
  */
 final case class ShorthandPointer(val id: String) extends XPointer {
 
-  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[E]): Option[E] = {
+  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[_, E]): Option[E] = {
     findElemOrSelfById(doc.documentElement, id)
   }
 }
@@ -51,7 +51,7 @@ trait ElementSchemePointer extends XPointer
  */
 final case class IdPointer(val id: String) extends ElementSchemePointer {
 
-  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[E]): Option[E] = {
+  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[_, E]): Option[E] = {
     findElemOrSelfById(doc.documentElement, id)
   }
 }
@@ -62,7 +62,7 @@ final case class IdPointer(val id: String) extends ElementSchemePointer {
 final case class ChildSequencePointer(val childSeq: List[Int]) extends ElementSchemePointer {
   require(!childSeq.isEmpty, s"The child sequence must not be empty")
 
-  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[E]): Option[E] = childSeq match {
+  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[_, E]): Option[E] = childSeq match {
     case hd :: tl if hd == 1 =>
       val indices = tl.map(_ - 1)
 
@@ -77,7 +77,7 @@ final case class ChildSequencePointer(val childSeq: List[Int]) extends ElementSc
 final case class IdChildSequencePointer(val id: String, val childSeq: List[Int]) extends ElementSchemePointer {
   require(!childSeq.isEmpty, s"The child sequence must not be empty")
 
-  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[E]): Option[E] = {
+  private[xpointer] def findElem[E <: ScopedElemApi.Aux[E]](doc: DocumentApi.Aux[_, E]): Option[E] = {
     val firstElemOption = findElemOrSelfById(doc.documentElement, id)
 
     firstElemOption flatMap { e =>
@@ -120,7 +120,7 @@ object XPointer {
    * Adds XPointer-awareness to a documents that offers the ScopedElemApi query API for its elements.
    * That is, adds functions findElemByXPointer and findElemByXPointers.
    */
-  implicit final class XPointerAwareDocument[E <: ScopedElemApi.Aux[E]](val doc: DocumentApi.Aux[E]) {
+  implicit final class XPointerAwareDocument[E <: ScopedElemApi.Aux[E]](val doc: DocumentApi.Aux[_, E]) {
 
     def findElemByXPointer(xpointer: XPointer): Option[E] = xpointer.findElem(doc)
 

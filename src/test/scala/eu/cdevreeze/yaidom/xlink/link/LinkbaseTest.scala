@@ -48,10 +48,10 @@ class LinkbaseTest extends Suite {
     val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/202-01-HrefResolution-label.xml").toURI
 
     val doc = docParser.parse(docUri)
-    val bridgeElem =
+    val backingElem =
       indexed.Document.from(doc.withUriOption(Some(docUri))).documentElement
 
-    val linkbase = Linkbase(bridgeElem)
+    val linkbase = Linkbase(backingElem)
 
     val labelLinks = linkbase.labelLinks
 
@@ -123,7 +123,7 @@ class LinkbaseTest extends Suite {
             scope,
             locs ++ labels ++ arcs)))
 
-    val original = resolved.Elem(linkbase.bridgeElem.asInstanceOf[indexed.Elem].underlyingElem).removeAllInterElementWhitespace
+    val original = resolved.Elem(linkbase.backingElem.asInstanceOf[indexed.Elem].underlyingElem).removeAllInterElementWhitespace
 
     val reconstructed = resolved.Elem(lb).removeAllInterElementWhitespace
 
@@ -148,10 +148,10 @@ class LinkbaseTest extends Suite {
     val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/291-11-ArcOverrideReferenceLinkbases-2-reference.xml").toURI
 
     val doc = docParser.parse(docUri)
-    val bridgeElem =
+    val backingElem =
       indexed.Document.from(doc.withUriOption(Some(docUri))).documentElement
 
-    val linkbase = Linkbase(bridgeElem)
+    val linkbase = Linkbase(backingElem)
 
     val referenceLinks = linkbase.referenceLinks
 
@@ -213,7 +213,7 @@ class LinkbaseTest extends Suite {
         plusAttribute(QName("xlink:type"), ref.xlinkType.toString).
         plusAttribute(QName("xlink:label"), ref.label).
         plusAttributeOption(QName("xlink:role"), ref.roleOption).
-        withChildren(ref.findAllChildElems.map(_.bridgeElem.asInstanceOf[indexed.Elem].underlyingElem))
+        withChildren(ref.findAllChildElems.map(_.backingElem.asInstanceOf[indexed.Elem].underlyingElem))
     }
 
     val lb =
@@ -227,7 +227,7 @@ class LinkbaseTest extends Suite {
             scope,
             locs ++ references ++ arcs)))
 
-    val original = resolved.Elem(linkbase.bridgeElem.asInstanceOf[indexed.Elem].underlyingElem).removeAllInterElementWhitespace
+    val original = resolved.Elem(linkbase.backingElem.asInstanceOf[indexed.Elem].underlyingElem).removeAllInterElementWhitespace
 
     val reconstructed = resolved.Elem(lb).removeAllInterElementWhitespace
 
@@ -252,10 +252,10 @@ class LinkbaseTest extends Suite {
     val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/DecArcCyclesUD_definition.xml").toURI
 
     val doc = docParser.parse(docUri)
-    val bridgeElem =
+    val backingElem =
       indexed.Document.from(doc.withUriOption(Some(docUri))).documentElement
 
-    val linkbase = Linkbase(bridgeElem)
+    val linkbase = Linkbase(backingElem)
 
     val extendedLinks = linkbase.extendedLinks
 
@@ -300,10 +300,10 @@ class LinkbaseTest extends Suite {
     val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/ArcRoleDR_presentation.xml").toURI
 
     val doc = docParser.parse(docUri)
-    val bridgeElem =
+    val backingElem =
       indexed.Document.from(doc.withUriOption(Some(docUri))).documentElement
 
-    val linkbase = Linkbase(bridgeElem)
+    val linkbase = Linkbase(backingElem)
 
     assertResult(2) {
       linkbase.findAllChildElemsOfType(classTag[ArcroleRef]).size
@@ -331,10 +331,10 @@ class LinkbaseTest extends Suite {
     val docUri = classOf[LinkbaseTest].getResource(s"$pathPrefix/ArcCyclesSIUC_calculation.xml").toURI
 
     val doc = docParser.parse(docUri)
-    val bridgeElem =
+    val backingElem =
       indexed.Document.from(doc.withUriOption(Some(docUri))).documentElement
 
-    val linkbase = Linkbase(bridgeElem)
+    val linkbase = Linkbase(backingElem)
 
     assertResult(0) {
       linkbase.findAllChildElemsOfType(classTag[ArcroleRef]).size
@@ -365,10 +365,10 @@ class LinkbaseTest extends Suite {
     val docUri = classOf[LinkbaseTest].getResource("/sample-generic-linkbase.xml").toURI
 
     val doc = docParser.parse(docUri)
-    val bridgeElem =
+    val backingElem =
       indexed.Document.from(doc.withUriOption(Some(docUri))).documentElement
 
-    val linkbase = Linkbase(bridgeElem)
+    val linkbase = Linkbase(backingElem)
 
     val extendedLinks = linkbase.extendedLinks
     val genericLinks = linkbase.genericLinks

@@ -48,10 +48,8 @@ import eu.cdevreeze.yaidom.xlink.xl
  * @author Chris de Vreeze
  */
 sealed abstract class LinkbaseElem private[link] (
-  val bridgeElem: BridgeElem,
+  val backingElem: BackingElem,
   childElems: immutable.IndexedSeq[LinkbaseElem]) extends ScopedElemLike with SubtypeAwareElemLike {
-
-  type ThisElemApi = LinkbaseElem
 
   type ThisElem = LinkbaseElem
 
@@ -62,29 +60,29 @@ sealed abstract class LinkbaseElem private[link] (
    */
   final def findAllChildElems: immutable.IndexedSeq[LinkbaseElem] = childElems
 
-  final def resolvedName: EName = bridgeElem.resolvedName
+  final def resolvedName: EName = backingElem.resolvedName
 
-  final def resolvedAttributes: immutable.Iterable[(EName, String)] = bridgeElem.resolvedAttributes
+  final def resolvedAttributes: immutable.Iterable[(EName, String)] = backingElem.resolvedAttributes
 
-  final def qname: QName = bridgeElem.qname
+  final def qname: QName = backingElem.qname
 
-  final def attributes: immutable.Iterable[(QName, String)] = bridgeElem.attributes
+  final def attributes: immutable.Iterable[(QName, String)] = backingElem.attributes
 
-  final def scope: Scope = bridgeElem.scope
+  final def scope: Scope = backingElem.scope
 
-  final def text: String = bridgeElem.text
+  final def text: String = backingElem.text
 
   final override def equals(other: Any): Boolean = other match {
-    case e: LinkbaseElem => bridgeElem == e.bridgeElem
+    case e: LinkbaseElem => backingElem == e.backingElem
     case _               => false
   }
 
-  final override def hashCode: Int = bridgeElem.hashCode
+  final override def hashCode: Int = backingElem.hashCode
 }
 
 final class Linkbase private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(backingElem, childElems) {
 
   require(resolvedName == LinkLinkbaseEName)
 
@@ -118,16 +116,16 @@ final class Linkbase private[link] (
 // XLink
 
 abstract class XLink private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(bridgeElem, childElems) with xl.XLink {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(backingElem, childElems) with xl.XLink {
 
   final def xlinkAttributes: immutable.IndexedSeq[(EName, String)] =
     resolvedAttributes.toVector filter { case (ename, value) => ename.namespaceUriOption == Some(xl.XLink.XLinkNamespace) }
 }
 
 class SimpleLink private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(bridgeElem, childElems) with xl.SimpleLink {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(backingElem, childElems) with xl.SimpleLink {
 
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeSimple
 
@@ -143,7 +141,7 @@ class SimpleLink private[link] (
 
   final def actuateOption: Option[String] = attributeOption(xl.XLink.XLinkActuateEName)
 
-  final def resolvedHref: URI = bridgeElem.baseUriOption.getOrElse(URI.create("")).resolve(href)
+  final def resolvedHref: URI = backingElem.baseUriOption.getOrElse(URI.create("")).resolve(href)
 }
 
 // Extended links
@@ -153,8 +151,8 @@ class SimpleLink private[link] (
  * for the base URI.
  */
 abstract class ExtendedLink private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(bridgeElem, childElems) with xl.ExtendedLink {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(backingElem, childElems) with xl.ExtendedLink {
 
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeExtended
 
@@ -176,7 +174,7 @@ abstract class ExtendedLink private[link] (
     (resources ++ locators).groupBy(_.label)
   }
 
-  final val baseUri: URI = bridgeElem.baseUriOption.getOrElse(URI.create(""))
+  final val baseUri: URI = backingElem.baseUriOption.getOrElse(URI.create(""))
 
   final def role: String = attribute(xl.XLink.XLinkRoleEName)
 
@@ -196,18 +194,18 @@ abstract class ExtendedLink private[link] (
 }
 
 abstract class StandardExtendedLink private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends ExtendedLink(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends ExtendedLink(backingElem, childElems) {
 }
 
 class GenericLink private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends ExtendedLink(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends ExtendedLink(backingElem, childElems) {
 }
 
 final class LabelLink private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(backingElem, childElems) {
 
   require(resolvedName == LinkLabelLinkEName)
 
@@ -219,8 +217,8 @@ final class LabelLink private[link] (
 }
 
 final class ReferenceLink private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(backingElem, childElems) {
 
   require(resolvedName == LinkReferenceLinkEName)
 
@@ -232,8 +230,8 @@ final class ReferenceLink private[link] (
 }
 
 final class CalculationLink private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(backingElem, childElems) {
 
   require(resolvedName == LinkCalculationLinkEName)
 
@@ -242,8 +240,8 @@ final class CalculationLink private[link] (
 }
 
 final class PresentationLink private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(backingElem, childElems) {
 
   require(resolvedName == LinkPresentationLinkEName)
 
@@ -252,8 +250,8 @@ final class PresentationLink private[link] (
 }
 
 final class DefinitionLink private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(backingElem, childElems) {
 
   require(resolvedName == LinkDefinitionLinkEName)
 
@@ -262,8 +260,8 @@ final class DefinitionLink private[link] (
 }
 
 final class FootnoteLink private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardExtendedLink(backingElem, childElems) {
 
   require(resolvedName == LinkFootnoteLinkEName)
 
@@ -280,15 +278,15 @@ final class FootnoteLink private[link] (
  * Arc in XBRL.
  */
 abstract class Arc private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(bridgeElem, childElems) with xl.Arc {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(backingElem, childElems) with xl.Arc {
 
-  require(!bridgeElem.path.isEmpty, s"Missing parent extended link of $resolvedName")
+  require(!backingElem.path.isEmpty, s"Missing parent extended link of $resolvedName")
 
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeArc
 
   final def elr: String =
-    bridgeElem.rootElem.getElemOrSelfByPath(bridgeElem.path.parentPath).asInstanceOf[HasENameApi].attribute(xl.XLink.XLinkRoleEName)
+    backingElem.rootElem.getElemOrSelfByPath(backingElem.path.parentPath).asInstanceOf[HasENameApi].attribute(xl.XLink.XLinkRoleEName)
 
   final def from: String = attribute(xl.XLink.XLinkFromEName)
 
@@ -315,34 +313,34 @@ abstract class Arc private[link] (
 }
 
 abstract class StandardArc private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends Arc(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends Arc(backingElem, childElems) {
 }
 
 class GenericArc private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends Arc(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends Arc(backingElem, childElems) {
 
   require(resolvedName == GenArcEName)
 }
 
 final class LabelArc private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(backingElem, childElems) {
 
   require(resolvedName == LinkLabelArcEName)
 }
 
 final class ReferenceArc private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(backingElem, childElems) {
 
   require(resolvedName == LinkReferenceArcEName)
 }
 
 final class CalculationArc private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(backingElem, childElems) {
 
   require(resolvedName == LinkCalculationArcEName)
 
@@ -350,8 +348,8 @@ final class CalculationArc private[link] (
 }
 
 final class PresentationArc private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(backingElem, childElems) {
 
   require(resolvedName == LinkPresentationArcEName)
 
@@ -359,15 +357,15 @@ final class PresentationArc private[link] (
 }
 
 final class DefinitionArc private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(backingElem, childElems) {
 
   require(resolvedName == LinkDefinitionArcEName)
 }
 
 final class FootnoteArc private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardArc(backingElem, childElems) {
 
   require(resolvedName == LinkFootnoteArcEName)
 }
@@ -378,15 +376,15 @@ final class FootnoteArc private[link] (
  * Locator in XBRL.
  */
 abstract class Locator private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(bridgeElem, childElems) with xl.Locator {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(backingElem, childElems) with xl.Locator {
 
-  require(!bridgeElem.path.isEmpty, s"Missing parent extended link of $resolvedName")
+  require(!backingElem.path.isEmpty, s"Missing parent extended link of $resolvedName")
 
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeLocator
 
   final def elr: String =
-    bridgeElem.rootElem.getElemOrSelfByPath(bridgeElem.path.parentPath).asInstanceOf[HasENameApi].attribute(xl.XLink.XLinkRoleEName)
+    backingElem.rootElem.getElemOrSelfByPath(backingElem.path.parentPath).asInstanceOf[HasENameApi].attribute(xl.XLink.XLinkRoleEName)
 
   final def label: String = attribute(xl.XLink.XLinkLabelEName)
 
@@ -399,12 +397,12 @@ abstract class Locator private[link] (
   final def titleElems: immutable.IndexedSeq[Title] =
     findAllChildElemsOfType(classTag[Title])
 
-  final def resolvedHref: URI = bridgeElem.baseUriOption.getOrElse(URI.create("").resolve(href))
+  final def resolvedHref: URI = backingElem.baseUriOption.getOrElse(URI.create("").resolve(href))
 }
 
 final class StandardLocator private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends Locator(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends Locator(backingElem, childElems) {
 
   require(resolvedName == LinkLocEName)
 }
@@ -415,15 +413,15 @@ final class StandardLocator private[link] (
  * Resource in XBRL.
  */
 abstract class Resource private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(bridgeElem, childElems) with xl.Resource {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(backingElem, childElems) with xl.Resource {
 
-  require(!bridgeElem.path.isEmpty, s"Missing parent extended link of $resolvedName")
+  require(!backingElem.path.isEmpty, s"Missing parent extended link of $resolvedName")
 
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeResource
 
   final def elr: String =
-    bridgeElem.rootElem.getElemOrSelfByPath(bridgeElem.path.parentPath).asInstanceOf[HasENameApi].attribute(xl.XLink.XLinkRoleEName)
+    backingElem.rootElem.getElemOrSelfByPath(backingElem.path.parentPath).asInstanceOf[HasENameApi].attribute(xl.XLink.XLinkRoleEName)
 
   final def label: String = attribute(xl.XLink.XLinkLabelEName)
 
@@ -433,48 +431,48 @@ abstract class Resource private[link] (
 }
 
 abstract class StandardResource private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends Resource(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends Resource(backingElem, childElems) {
 }
 
 class GenericResource private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends Resource(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends Resource(backingElem, childElems) {
 }
 
 final class LabelResource private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardResource(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardResource(backingElem, childElems) {
 
   require(resolvedName == LinkLabelEName)
 
-  def langOption: Option[String] = bridgeElem.attributeOption(XmlLangEName)
+  def langOption: Option[String] = backingElem.attributeOption(XmlLangEName)
 }
 
 final class ReferenceResource private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardResource(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardResource(backingElem, childElems) {
 
   require(resolvedName == LinkReferenceEName)
 }
 
 final class FootnoteResource private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardResource(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends StandardResource(backingElem, childElems) {
 
   require(resolvedName == LinkFootnoteEName)
 }
 
 final class GenericLabelResource private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends GenericResource(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends GenericResource(backingElem, childElems) {
 
   require(resolvedName == LabelLabelEName)
 }
 
 final class GenericReferenceResource private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends GenericResource(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends GenericResource(backingElem, childElems) {
 
   require(resolvedName == ReferenceReferenceEName)
 }
@@ -482,8 +480,8 @@ final class GenericReferenceResource private[link] (
 // Title
 
 class Title private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(bridgeElem, childElems) with xl.Title {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends XLink(backingElem, childElems) with xl.Title {
 
   final def xlinkType: xl.XLink.XLinkType = xl.XLink.XLinkTypeTitle
 }
@@ -491,15 +489,15 @@ class Title private[link] (
 // Miscellaneous
 
 final class Documentation private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(backingElem, childElems) {
 
   require(resolvedName == LinkDocumentationEName)
 }
 
 final class LinkbaseRef private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends SimpleLink(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends SimpleLink(backingElem, childElems) {
 
   require(resolvedName == LinkLinkbaseRefEName)
 
@@ -507,15 +505,15 @@ final class LinkbaseRef private[link] (
 }
 
 final class SchemaRef private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends SimpleLink(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends SimpleLink(backingElem, childElems) {
 
   require(resolvedName == LinkSchemaRefEName)
 }
 
 final class RoleRef private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends SimpleLink(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends SimpleLink(backingElem, childElems) {
 
   require(resolvedName == LinkRoleRefEName)
 
@@ -525,8 +523,8 @@ final class RoleRef private[link] (
 }
 
 final class ArcroleRef private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends SimpleLink(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends SimpleLink(backingElem, childElems) {
 
   require(resolvedName == LinkArcroleRefEName)
 
@@ -536,22 +534,22 @@ final class ArcroleRef private[link] (
 }
 
 final class Definition private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(backingElem, childElems) {
 
   require(resolvedName == LinkDefinitionEName)
 }
 
 final class UsedOn private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(backingElem, childElems) {
 
   require(resolvedName == LinkUsedOnEName)
 }
 
 final class RoleType private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(backingElem, childElems) {
 
   require(resolvedName == LinkRoleTypeEName)
 
@@ -559,8 +557,8 @@ final class RoleType private[link] (
 }
 
 final class ArcroleType private[link] (
-  bridgeElem: BridgeElem,
-  childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(bridgeElem, childElems) {
+  backingElem: BackingElem,
+  childElems: immutable.IndexedSeq[LinkbaseElem]) extends LinkbaseElem(backingElem, childElems) {
 
   require(resolvedName == LinkArcroleTypeEName)
 
@@ -572,13 +570,13 @@ final class ArcroleType private[link] (
 object LinkbaseElem {
 
   /** Creates a LinkbaseElem. This method is rather expensive. */
-  def apply(elem: BridgeElem): LinkbaseElem = {
+  def apply(elem: BackingElem): LinkbaseElem = {
     // Recursive calls
     val childElems = elem.findAllChildElems.map(e => apply(e))
     apply(elem, childElems)
   }
 
-  private[link] def apply(elem: BridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): LinkbaseElem = {
+  private[link] def apply(elem: BackingElem, childElems: immutable.IndexedSeq[LinkbaseElem]): LinkbaseElem = {
     elem.attributeOption(xl.XLink.XLinkTypeEName) match {
       case Some("extended") => applyForExtendedLink(elem, childElems)
       case Some("simple")   => applyForSimpleLink(elem, childElems)
@@ -599,7 +597,7 @@ object LinkbaseElem {
     }
   }
 
-  private[link] def applyForExtendedLink(elem: BridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): ExtendedLink = {
+  private[link] def applyForExtendedLink(elem: BackingElem, childElems: immutable.IndexedSeq[LinkbaseElem]): ExtendedLink = {
     elem.resolvedName match {
       case LinkLabelLinkEName        => new LabelLink(elem, childElems)
       case LinkReferenceLinkEName    => new ReferenceLink(elem, childElems)
@@ -611,7 +609,7 @@ object LinkbaseElem {
     }
   }
 
-  private[link] def applyForSimpleLink(elem: BridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): SimpleLink = {
+  private[link] def applyForSimpleLink(elem: BackingElem, childElems: immutable.IndexedSeq[LinkbaseElem]): SimpleLink = {
     elem.resolvedName match {
       case LinkSchemaRefEName   => new SchemaRef(elem, childElems)
       case LinkLinkbaseRefEName => new LinkbaseRef(elem, childElems)
@@ -621,7 +619,7 @@ object LinkbaseElem {
     }
   }
 
-  private[link] def applyForArc(elem: BridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): Arc = {
+  private[link] def applyForArc(elem: BackingElem, childElems: immutable.IndexedSeq[LinkbaseElem]): Arc = {
     elem.resolvedName match {
       case LinkLabelArcEName        => new LabelArc(elem, childElems)
       case LinkReferenceArcEName    => new ReferenceArc(elem, childElems)
@@ -634,14 +632,14 @@ object LinkbaseElem {
     }
   }
 
-  private[link] def applyForLocator(elem: BridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): Locator = {
+  private[link] def applyForLocator(elem: BackingElem, childElems: immutable.IndexedSeq[LinkbaseElem]): Locator = {
     elem.resolvedName match {
       case LinkLocEName => new StandardLocator(elem, childElems)
       case _            => sys.error(s"Not recognized as locator: ${elem.resolvedName}")
     }
   }
 
-  private[link] def applyForResource(elem: BridgeElem, childElems: immutable.IndexedSeq[LinkbaseElem]): Resource = {
+  private[link] def applyForResource(elem: BackingElem, childElems: immutable.IndexedSeq[LinkbaseElem]): Resource = {
     elem.resolvedName match {
       case LinkLabelEName          => new LabelResource(elem, childElems)
       case LinkReferenceEName      => new ReferenceResource(elem, childElems)
@@ -656,12 +654,12 @@ object LinkbaseElem {
 object Linkbase {
 
   /** Creates a Linkbase. This method is rather expensive. */
-  def apply(elem: BridgeElem): Linkbase = {
+  def apply(elem: BackingElem): Linkbase = {
     new Linkbase(elem, elem.findAllChildElems.map(e => LinkbaseElem(e)))
   }
 
   /** Returns true if the element must be a linkbase (looking at the element resolved name) */
-  def accepts(elem: BridgeElem): Boolean = {
+  def accepts(elem: BackingElem): Boolean = {
     elem.resolvedName == LinkLinkbaseEName
   }
 }
