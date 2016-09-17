@@ -21,7 +21,7 @@ import scala.reflect.classTag
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
@@ -39,9 +39,9 @@ import eu.cdevreeze.yaidom.xlink.xl
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class LinkbaseTest extends Suite {
+class LinkbaseTest extends FunSuite {
 
-  @Test def testReconstructLabelLinkbase(): Unit = {
+  test("testReconstructLabelLinkbase") {
     val docParser = DocumentParserUsingDom.newInstance
 
     val pathPrefix = "/XBRL-CONF-CR5-2012-01-24/Common/200-linkbase"
@@ -141,7 +141,7 @@ class LinkbaseTest extends Suite {
     }
   }
 
-  @Test def testReconstructReferenceLinkbase(): Unit = {
+  test("testReconstructReferenceLinkbase") {
     val docParser = DocumentParserUsingDom.newInstance
 
     val pathPrefix = "/XBRL-CONF-CR5-2012-01-24/Common/200-linkbase"
@@ -245,7 +245,7 @@ class LinkbaseTest extends Suite {
     }
   }
 
-  @Test def testMultipleDefinitionLinks(): Unit = {
+  test("testMultipleDefinitionLinks") {
     val docParser = DocumentParserUsingDom.newInstance
 
     val pathPrefix = "/XBRL-CONF-CR5-2012-01-24/Common/200-linkbase"
@@ -293,7 +293,7 @@ class LinkbaseTest extends Suite {
     }
   }
 
-  @Test def testMultiplePresentationLinks(): Unit = {
+  test("testMultiplePresentationLinks") {
     val docParser = DocumentParserUsingDom.newInstance
 
     val pathPrefix = "/XBRL-CONF-CR5-2012-01-24/Common/200-linkbase"
@@ -324,7 +324,7 @@ class LinkbaseTest extends Suite {
     }
   }
 
-  @Test def testMultipleCalculationLinks(): Unit = {
+  test("testMultipleCalculationLinks") {
     val docParser = DocumentParserUsingDom.newInstance
 
     val pathPrefix = "/XBRL-CONF-CR5-2012-01-24/Common/200-linkbase"
@@ -359,7 +359,7 @@ class LinkbaseTest extends Suite {
     }
   }
 
-  @Test def testGenericLink(): Unit = {
+  test("testGenericLink") {
     val docParser = DocumentParserUsingDom.newInstance
 
     val docUri = classOf[LinkbaseTest].getResource("/sample-generic-linkbase.xml").toURI

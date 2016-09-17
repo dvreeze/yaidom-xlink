@@ -19,7 +19,7 @@ libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "1.6.0-M4"
 
 libraryDependencies += "junit" % "junit" % "4.12" % "test"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.5" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 
 // resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
 

@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom.xlink.xpointer
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
@@ -35,7 +35,7 @@ import eu.cdevreeze.yaidom.core.Path
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class XPointerTest extends Suite {
+class XPointerTest extends FunSuite {
 
   private val XsNamespace = "http://www.w3.org/2001/XMLSchema"
   private val LinkNamespace = "http://www.xbrl.org/2003/linkbase"
@@ -47,7 +47,7 @@ class XPointerTest extends Suite {
     indexed.Document.from(doc)
   }
 
-  @Test def testParseShorthandPointer(): Unit = {
+  test("testParseShorthandPointer") {
     val xpointer = XPointer.parse("intro")
 
     assertResult(ShorthandPointer("intro")) {
@@ -55,7 +55,7 @@ class XPointerTest extends Suite {
     }
   }
 
-  @Test def testParseIdPointer(): Unit = {
+  test("testParseIdPointer") {
     val xpointer = XPointer.parse("element(intro)")
 
     assertResult(IdPointer("intro")) {
@@ -63,7 +63,7 @@ class XPointerTest extends Suite {
     }
   }
 
-  @Test def testParseChildSeqPointer(): Unit = {
+  test("testParseChildSeqPointer") {
     val xpointer = XPointer.parse("element(/1/3/15/2)")
 
     assertResult(ChildSequencePointer(List(1, 3, 15, 2))) {
@@ -71,7 +71,7 @@ class XPointerTest extends Suite {
     }
   }
 
-  @Test def testParseIdChildSeqPointer(): Unit = {
+  test("testParseIdChildSeqPointer") {
     val xpointer = XPointer.parse("element(intro/1/3/15/2)")
 
     assertResult(IdChildSequencePointer("intro", List(1, 3, 15, 2))) {
@@ -79,7 +79,7 @@ class XPointerTest extends Suite {
     }
   }
 
-  @Test def testParseMultipleXPointers(): Unit = {
+  test("testParseMultipleXPointers") {
     val xpointers = XPointer.parseXPointers("element(intro/1/3/15/2)element(intro)element(/1/3)")
 
     assertResult(
@@ -92,7 +92,7 @@ class XPointerTest extends Suite {
       }
   }
 
-  @Test def testUseShorthandPointer(): Unit = {
+  test("testUseShorthandPointer") {
     val xpointer = XPointer.parse("all")
 
     assertResult(ShorthandPointer("all")) {
@@ -112,7 +112,7 @@ class XPointerTest extends Suite {
     }
   }
 
-  @Test def testUseIdPointer(): Unit = {
+  test("testUseIdPointer") {
     val xpointer = XPointer.parse("element(notAll)")
 
     assertResult(IdPointer("notAll")) {
@@ -136,7 +136,7 @@ class XPointerTest extends Suite {
     }
   }
 
-  @Test def testUseChildSequencePointer(): Unit = {
+  test("testUseChildSequencePointer") {
     val xpointer = XPointer.parse("element(/1/1/1/4)")
 
     assertResult(ChildSequencePointer(List(1, 1, 1, 4))) {
@@ -160,7 +160,7 @@ class XPointerTest extends Suite {
     }
   }
 
-  @Test def testUseIdChildSequencePointer(): Unit = {
+  test("testUseIdChildSequencePointer") {
     val xpointer = XPointer.parse("element(all/2)")
 
     assertResult(IdChildSequencePointer("all", List(2))) {
@@ -185,7 +185,7 @@ class XPointerTest extends Suite {
     }
   }
 
-  @Test def testUseMultipleXPointers(): Unit = {
+  test("testUseMultipleXPointers") {
     val xpointers = XPointer.parseXPointers("element(intro/1/3/15/2)element(intro)element(all/2)element(/1/10000)")
 
     assertResult(

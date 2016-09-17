@@ -21,7 +21,7 @@ import scala.collection.immutable
 
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.Suite
+import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.Declarations
@@ -37,9 +37,9 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
  * @author Chris de Vreeze
  */
 @RunWith(classOf[JUnitRunner])
-class XLinkTest extends Suite {
+class XLinkTest extends FunSuite {
 
-  @Test def testRetrieval(): Unit = {
+  test("testRetrieval") {
     doTest(sampleXml.wrappedElem)
   }
 
