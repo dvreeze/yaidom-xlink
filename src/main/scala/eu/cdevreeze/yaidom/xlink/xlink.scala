@@ -37,7 +37,7 @@ sealed abstract class XLink(val wrappedElem: Elem) extends Immutable {
   require(wrappedElem ne null)
   require(
     wrappedElem.attributeOption(XLinkTypeEName).isDefined || wrappedElem.attributeOption(XLinkHrefEName).isDefined,
-    "Missing both %s and %s".format(XLinkTypeEName, XLinkHrefEName))
+    s"Expected at least one of attributes $XLinkTypeEName and $XLinkHrefEName in element $wrappedElem")
 
   def xlinkType: String = wrappedElem.attributeOption(XLinkTypeEName).getOrElse("simple")
 
@@ -49,10 +49,10 @@ sealed abstract class XLink(val wrappedElem: Elem) extends Immutable {
 abstract class Link(override val wrappedElem: Elem) extends XLink(wrappedElem)
 
 final class SimpleLink(override val wrappedElem: Elem) extends Link(wrappedElem) {
-  require(xlinkType == "simple")
+  require(xlinkType == "simple", s"Expected XLink type 'simple' in element $wrappedElem")
   require(
     wrappedElem.attributeOption(XLinkTypeEName).isDefined || wrappedElem.attributeOption(XLinkHrefEName).isDefined,
-    "Missing both %s and %s".format(XLinkTypeEName, XLinkHrefEName))
+    s"Expected at least one of attributes $XLinkTypeEName and $XLinkHrefEName in element $wrappedElem")
 
   def hrefOption: Option[URI] = wrappedElem.attributeOption(XLinkHrefEName) map { s => URI.create(s) }
   def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleEName)
@@ -66,7 +66,7 @@ final class SimpleLink(override val wrappedElem: Elem) extends Link(wrappedElem)
  * Extended link. This object is expensive to create, because it aggressively caches its child XLinks.
  */
 final class ExtendedLink(override val wrappedElem: Elem) extends Link(wrappedElem) {
-  require(xlinkType == "extended")
+  require(xlinkType == "extended", s"Expected XLink type 'extended' in element $wrappedElem")
 
   /** Stored XLink children, preventing recreations of XLink children, possibly at the expense of somewhat more memory usage */
   val xlinkChildren: immutable.IndexedSeq[XLink] = wrappedElem.findAllChildElems collect { case e if mustBeXLink(e) => XLink(e) }
@@ -117,7 +117,7 @@ final class ExtendedLink(override val wrappedElem: Elem) extends Link(wrappedEle
 }
 
 final class Arc(override val wrappedElem: Elem) extends XLink(wrappedElem) {
-  require(xlinkType == "arc")
+  require(xlinkType == "arc", s"Expected XLink type 'arc' in element $wrappedElem")
 
   def fromOption: Option[String] = wrappedElem.attributeOption(XLinkFromEName)
   def toOption: Option[String] = wrappedElem.attributeOption(XLinkToEName)
@@ -135,8 +135,8 @@ abstract class LabeledXLink(override val wrappedElem: Elem) extends XLink(wrappe
 }
 
 final class Locator(override val wrappedElem: Elem) extends LabeledXLink(wrappedElem) {
-  require(xlinkType == "locator")
-  require(wrappedElem.attributeOption(XLinkHrefEName).isDefined, "Missing %s".format(XLinkHrefEName))
+  require(xlinkType == "locator", s"Expected XLink type 'locator' in element $wrappedElem")
+  require(wrappedElem.attributeOption(XLinkHrefEName).isDefined, s"Missing attribute $XLinkHrefEName in $wrappedElem")
 
   def href: URI = wrappedElem.attributeOption(XLinkHrefEName) map { s => URI.create(s) } getOrElse (sys.error("Missing %s".format(XLinkHrefEName)))
   def labelOption: Option[String] = wrappedElem.attributeOption(XLinkLabelEName)
@@ -147,7 +147,7 @@ final class Locator(override val wrappedElem: Elem) extends LabeledXLink(wrapped
 }
 
 final class Resource(override val wrappedElem: Elem) extends LabeledXLink(wrappedElem) {
-  require(xlinkType == "resource")
+  require(xlinkType == "resource", s"Expected XLink type 'resource' in element $wrappedElem")
 
   def labelOption: Option[String] = wrappedElem.attributeOption(XLinkLabelEName)
   def roleOption: Option[String] = wrappedElem.attributeOption(XLinkRoleEName)
@@ -155,7 +155,7 @@ final class Resource(override val wrappedElem: Elem) extends LabeledXLink(wrappe
 }
 
 final class Title(override val wrappedElem: Elem) extends XLink(wrappedElem) {
-  require(xlinkType == "title")
+  require(xlinkType == "title", s"Expected XLink type 'title' in element $wrappedElem")
 }
 
 object XLink {
@@ -200,20 +200,20 @@ object XLink {
   def mustBeResource(e: Elem): Boolean = e.attributeOption(XLinkTypeEName) == Some("resource")
 
   def apply(e: Elem): XLink = e match {
-    case e if mustBeSimpleLink(e) => SimpleLink(e)
+    case e if mustBeSimpleLink(e)   => SimpleLink(e)
     case e if mustBeExtendedLink(e) => ExtendedLink(e)
-    case e if mustBeTitle(e) => Title(e)
-    case e if mustBeLocator(e) => Locator(e)
-    case e if mustBeArc(e) => Arc(e)
-    case e if mustBeResource(e) => Resource(e)
-    case e => sys.error("Not an XLink: %s".format(e))
+    case e if mustBeTitle(e)        => Title(e)
+    case e if mustBeLocator(e)      => Locator(e)
+    case e if mustBeArc(e)          => Arc(e)
+    case e if mustBeResource(e)     => Resource(e)
+    case e                          => sys.error(s"Not an XLink: $e")
   }
 }
 
 object Link {
 
   def apply(e: Elem): Link = e match {
-    case e if mustBeSimpleLink(e) => SimpleLink(e)
+    case e if mustBeSimpleLink(e)   => SimpleLink(e)
     case e if mustBeExtendedLink(e) => ExtendedLink(e)
   }
 }
