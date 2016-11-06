@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<properties>
-		<scala.version>2.11.7</scala.version>
+		<scala.version>2.11.8</scala.version>
 		<scala.binary.version>2.11</scala.binary.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -136,7 +136,7 @@
 		<dependency>
 			<groupId>eu.cdevreeze.yaidom</groupId>
 			<artifactId>yaidom_${scala.binary.version}</artifactId>
-			<version>1.6.0-M5</version>
+			<version>1.6.0-M7</version>
 		</dependency>
 
 		<!-- Testing dependencies -->
