@@ -16,8 +16,8 @@ crossScalaVersions := Seq("2.11.8", "2.12.0")
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint")
 
 libraryDependencies <+= scalaBinaryVersion apply { version =>
-  if (version.contains("2.12")) "eu.cdevreeze.yaidom" % "yaidom_2.12" % "1.6.0-M7"
-  else "eu.cdevreeze.yaidom" %% "yaidom" % "1.6.0-M7"
+  if (version.contains("2.12")) "eu.cdevreeze.yaidom" % "yaidom_2.12" % "1.6.0"
+  else "eu.cdevreeze.yaidom" %% "yaidom" % "1.6.0"
 }
 
 libraryDependencies += "junit" % "junit" % "4.12" % "test"
