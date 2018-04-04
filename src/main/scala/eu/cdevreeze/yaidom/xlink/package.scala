@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom
 
 /**
- * XLink support, in an XBRL context.
+ * Minimal XLink support, in an XBRL context.
  *
  * @author Chris de Vreeze
  */

@@ -28,9 +28,6 @@ import XLink._
  * Immutable XLink. See See http://www.w3.org/TR/xlink11/. An `XLink` wraps a yaidom "simple element".
  * The XLink support is without any support for XPointer.
  *
- * This XLink class and sub-classes will be phased out. They only wrap simple elements, and are less useful directly in an XBRL context,
- * because of many optional attributes that are mandatory in an XBRL context.
- *
  * @author Chris de Vreeze
  */
 sealed abstract class XLink(val wrappedElem: Elem) extends Immutable {
