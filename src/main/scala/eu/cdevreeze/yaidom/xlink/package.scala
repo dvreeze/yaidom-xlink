@@ -19,10 +19,6 @@ package eu.cdevreeze.yaidom
 /**
  * XLink support, in an XBRL context.
  *
- * The XLink class and its sub-classes in this package are legacy that will be phased out. They model "XLink as XLink",
- * without any restrictions imposed by XBRL. They also wrap only yaidom "simple elements". Both properties make these
- * classes less useful in an XBRL context.
- *
  * @author Chris de Vreeze
  */
 package object xlink

@@ -3,6 +3,14 @@ CHANGELOG
 =========
 
 
+1.7.0
+=====
+
+This version depends on yaidom 1.7.0. It is probably the last release, kept only around for legacy code
+that used yaidom-xlink. This version contains only the ``XLink`` class and its sub-types. It will likely
+work with upcoming newer releases of the yaidom library. 
+
+
 1.6.0
 =====
 

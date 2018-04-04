@@ -7,25 +7,19 @@ name := "yaidom-xlink"
 
 organization := "eu.cdevreeze.yaidom"
 
-version := "1.6.1-SNAPSHOT"
+version := "1.7.0-SNAPSHOT"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.5"
 
-crossScalaVersions := Seq("2.11.8", "2.12.0")
+crossScalaVersions := Seq("2.12.5", "2.11.12")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint")
 
-libraryDependencies <+= scalaBinaryVersion apply { version =>
-  if (version.contains("2.12")) "eu.cdevreeze.yaidom" % "yaidom_2.12" % "1.6.0"
-  else "eu.cdevreeze.yaidom" %% "yaidom" % "1.6.0"
-}
+libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "1.7.1"
 
 libraryDependencies += "junit" % "junit" % "4.12" % "test"
 
-libraryDependencies <+= scalaBinaryVersion apply { version =>
-  if (version.contains("2.12")) "org.scalatest" % "scalatest_2.12" % "3.0.0" % "test"
-  else "org.scalatest" %% "scalatest" % "3.0.0" % "test"
-}
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 
 // resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
 

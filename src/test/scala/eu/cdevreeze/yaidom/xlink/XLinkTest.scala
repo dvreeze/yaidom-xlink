@@ -19,7 +19,6 @@ package eu.cdevreeze.yaidom.xlink
 import scala.Vector
 import scala.collection.immutable
 
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
