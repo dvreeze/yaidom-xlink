@@ -2,8 +2,10 @@
 Yaidom-xlink
 ============
 
-Yaidom-based XLink support. This project is being phased out, and kept around in minimal form only for
-legacy code still using it.
+Yaidom-based XLink support. This project is being phased out, and kept around only for legacy code that
+still uses it. It has been stripped to its bare essentials, containing only the ``XLink`` type and its
+sub-types. This way the legacy code using this project can keep using it, while the yaidom library can
+be upgraded to a newer version and still be used in combination with this release of yaidom-xlink. 
 
 Usage
 =====
