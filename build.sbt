@@ -13,8 +13,6 @@ scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warning
 
 libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "1.10.1"
 
-libraryDependencies += "junit" % "junit" % "4.12" % "test"
-
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % "test"
 
 mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom-xlink" % "1.7.0")

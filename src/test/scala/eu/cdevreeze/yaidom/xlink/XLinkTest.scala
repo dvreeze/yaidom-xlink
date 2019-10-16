@@ -16,12 +16,9 @@
 
 package eu.cdevreeze.yaidom.xlink
 
-import scala.Vector
 import scala.collection.immutable
 
-import org.junit.runner.RunWith
 import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
@@ -35,7 +32,6 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
 class XLinkTest extends FunSuite {
 
   test("testRetrieval") {
