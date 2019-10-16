@@ -17,6 +17,8 @@ libraryDependencies += "junit" % "junit" % "4.12" % "test"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % "test"
 
+mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom-xlink" % "1.7.0")
+
 publishMavenStyle := true
 
 publishTo := {

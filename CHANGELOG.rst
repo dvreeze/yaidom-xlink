@@ -3,12 +3,42 @@ CHANGELOG
 =========
 
 
+1.8.0
+=====
+
+This version depends on yaidom 1.10.1 and supports Scala 2.13. It is probably the last release, kept around only for legacy code
+that uses yaidom-xlink. This version contains only the ``XLink`` class and its sub-types. It will likely
+still work with upcoming newer releases of the yaidom library.
+
+Due to the support for Scala 2.13 (whereas support for Scala 2.11 has been dropped), marker trait ``Immutable`` is no longer
+available. This leads to the following breaking changes compared to version 1.7.0 (in SBT, run: yaidomJVM/*:mimaReportBinaryIssues):
+
+* the type hierarchy of class eu.cdevreeze.yaidom.xlink.XLink is different in current version. Missing types {scala.Immutable}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.xlink.XLink")
+* the type hierarchy of class eu.cdevreeze.yaidom.xlink.ExtendedLink is different in current version. Missing types {scala.Immutable}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.xlink.ExtendedLink")
+* the type hierarchy of class eu.cdevreeze.yaidom.xlink.Resource is different in current version. Missing types {scala.Immutable}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.xlink.Resource")
+* the type hierarchy of class eu.cdevreeze.yaidom.xlink.Arc is different in current version. Missing types {scala.Immutable}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.xlink.Arc")
+* the type hierarchy of class eu.cdevreeze.yaidom.xlink.LabeledXLink is different in current version. Missing types {scala.Immutable}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.xlink.LabeledXLink")
+* the type hierarchy of class eu.cdevreeze.yaidom.xlink.SimpleLink is different in current version. Missing types {scala.Immutable}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.xlink.SimpleLink")
+* the type hierarchy of class eu.cdevreeze.yaidom.xlink.Title is different in current version. Missing types {scala.Immutable}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.xlink.Title")
+* the type hierarchy of class eu.cdevreeze.yaidom.xlink.Locator is different in current version. Missing types {scala.Immutable}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.xlink.Locator")
+* the type hierarchy of class eu.cdevreeze.yaidom.xlink.Link is different in current version. Missing types {scala.Immutable}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.xlink.Link")
+
+
 1.7.0
 =====
 
 This version depends on yaidom 1.7.0. It is probably the last release, kept around only for legacy code
 that uses yaidom-xlink. This version contains only the ``XLink`` class and its sub-types. It will likely
-still work with upcoming newer releases of the yaidom library. 
+still work with upcoming newer releases of the yaidom library.
 
 
 1.6.0
