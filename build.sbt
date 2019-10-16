@@ -1,43 +1,35 @@
 
-// Keep in sync with the Maven pom.xml file!
-// See http://www.scala-sbt.org/release/docs/Community/Using-Sonatype.html for how to publish to
-// Sonatype, using sbt only.
-
 name := "yaidom-xlink"
 
 organization := "eu.cdevreeze.yaidom"
 
-version := "1.7.1-SNAPSHOT"
+version := "1.8.0-SNAPSHOT"
 
-scalaVersion := "2.12.5"
+scalaVersion := "2.13.1"
 
-crossScalaVersions := Seq("2.12.5", "2.11.12")
+crossScalaVersions := Seq("2.13.1", "2.12.10")
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint")
 
-libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "1.7.1"
+libraryDependencies += "eu.cdevreeze.yaidom" %% "yaidom" % "1.10.1"
 
 libraryDependencies += "junit" % "junit" % "4.12" % "test"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
-
-// resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
-
-// addCompilerPlugin("com.artima.supersafe" %% "supersafe" % "1.0.3")
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % "test"
 
 publishMavenStyle := true
 
-publishTo <<= version { (v: String) =>
+publishTo := {
   val nexus = "https://oss.sonatype.org/"
-  if (v.trim.endsWith("SNAPSHOT"))
+  if (isSnapshot.value)
     Some("snapshots" at nexus + "content/repositories/snapshots")
   else
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
 
-publishArtifact in Test := false
+Test / publishArtifact := false
 
-pomIncludeRepository := { repo => false }
+pomIncludeRepository := { _ => false }
 
 pomExtra := {
   <url>https://github.com/dvreeze/yaidom-xlink</url>

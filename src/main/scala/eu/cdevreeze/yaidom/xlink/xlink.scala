@@ -30,7 +30,7 @@ import XLink._
  *
  * @author Chris de Vreeze
  */
-sealed abstract class XLink(val wrappedElem: Elem) extends Immutable {
+sealed abstract class XLink(val wrappedElem: Elem) {
   require(wrappedElem ne null)
   require(
     wrappedElem.attributeOption(XLinkTypeEName).isDefined || wrappedElem.attributeOption(XLinkHrefEName).isDefined,
