@@ -11,7 +11,7 @@ that uses yaidom-xlink. This version contains only the ``XLink`` class and its s
 still work with upcoming newer releases of the yaidom library.
 
 Due to the support for Scala 2.13 (whereas support for Scala 2.11 has been dropped), marker trait ``Immutable`` is no longer
-available. This leads to the following breaking changes compared to version 1.7.0 (in SBT, run: yaidomJVM/*:mimaReportBinaryIssues):
+available. This leads to the following breaking changes compared to version 1.7.0 (in SBT, run: *:mimaReportBinaryIssues):
 
 * the type hierarchy of class eu.cdevreeze.yaidom.xlink.XLink is different in current version. Missing types {scala.Immutable}
   filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.xlink.XLink")
