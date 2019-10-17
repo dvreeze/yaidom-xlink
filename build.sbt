@@ -3,7 +3,7 @@ name := "yaidom-xlink"
 
 organization := "eu.cdevreeze.yaidom"
 
-version := "1.8.0"
+version := "1.9.0-SNAPSHOT"
 
 scalaVersion := "2.13.1"
 
